@@ -48,7 +48,7 @@ public class CustomerControler {
 		HttpHeaders headers=new HttpHeaders();
 		headers.setBearerAuth(token);
 		
-		return ResponseEntity.status(HttpStatus.OK).headers(headers).body("Login Successful");
+		return ResponseEntity.status(HttpStatus.OK).headers(headers).body("Login Successful"+token);
 	}
 	
 

@@ -63,12 +63,14 @@ public class CustomerServiceImp implements CustomerService {
 	@Override
 	public String registration(RegisterDTO registerdto) {
 		
-		if(repo.existsByCustomerEmailId(registerdto.getCustomerEmailId())){
+		String normalize=registerdto.getCustomerEmailId().trim().toLowerCase();
+		if(repo.existsByCustomerEmailId(normalize)){
 			throw new ResourceAlreadyExistsException("Email AlreadyExists");
 		}
 		
 				
 		Customer customer=modelmapper.map(registerdto, Customer.class);
+		customer.setCustomerEmailId(normalize);
 		customer.setPassword(passwordencoder.encode(registerdto.getPassword()));
 		
 		 for(Address address: customer.getAddress()) {
@@ -80,14 +82,13 @@ public class CustomerServiceImp implements CustomerService {
 	
     @Override
 	public String login(LoginRequestDTO logindto) {
-    	 System.out.println(logindto.getCustomerEmailId());
-    	 System.out.println(logindto.getPassword());
+    	String normalizedEmail = logindto.getCustomerEmailId().trim().toLowerCase();
     	 
     	Authentication authenticat= authmanager.authenticate(new UsernamePasswordAuthenticationToken
-    			(logindto.getCustomerEmailId(),logindto.getPassword()));
+    			(normalizedEmail,logindto.getPassword()));
     	
 	    if(authenticat.isAuthenticated()) {
-	    	 String token = jwtservice.generateToken(logindto.getCustomerEmailId());
+	    	 String token = jwtservice.generateToken(normalizedEmail);
 	 
      System.out.println(token);
 	    
