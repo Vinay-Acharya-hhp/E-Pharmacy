@@ -1,4 +1,4 @@
-package com.epharmacy.pharmacy_user_service.customerDto;
+package com.epharmacy.pharmacy_user_service.customerDto.response;
 
 
 

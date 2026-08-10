@@ -1,9 +1,11 @@
-package com.epharmacy.pharmacy_user_service.customerDto;
+package com.epharmacy.pharmacy_user_service.customerDto.request;
 
 import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import com.epharmacy.pharmacy_user_service.customerDto.response.AddressDTO;
 import com.epharmacy.pharmacy_user_service.entity.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 

@@ -38,6 +38,7 @@ public class Customer {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	private String customerName;
+	@Column(unique =true,nullable =false)
 	private String customerEmailId;
 	private String contactNumber;
 	private String password;

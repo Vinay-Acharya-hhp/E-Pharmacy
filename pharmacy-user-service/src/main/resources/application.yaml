@@ -17,5 +17,10 @@ spring:
       hibernate:
         format_sql: true
 
+
 server:
-  port: 8081	
+  port: 8080
+  
+jwt:
+  secret: QWxhZGRpbjpPcGVuU2VzYW1lQWxhZGRpbjpPcGVuU2VzYW1lMTIzNDU2Nzg5  
+  

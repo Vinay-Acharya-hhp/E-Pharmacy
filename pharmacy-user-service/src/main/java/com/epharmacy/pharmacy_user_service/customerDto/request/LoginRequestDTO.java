@@ -1,4 +1,4 @@
-package com.epharmacy.pharmacy_user_service.customerDto;
+package com.epharmacy.pharmacy_user_service.customerDto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponseDTO {
-	private String token;
+public class LoginRequestDTO {
+	
+	private String customerEmailId;
+	private String password;
 
 }

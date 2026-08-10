@@ -1,14 +1,31 @@
 package com.epharmacy.pharmacy_user_service.service;
 
-import com.epharmacy.pharmacy_user_service.customerDto.LoginRequestDTO;
-import com.epharmacy.pharmacy_user_service.customerDto.LoginResponseDTO;
-import com.epharmacy.pharmacy_user_service.customerDto.RegisterDTO;
+import java.util.List;
+
+import com.epharmacy.pharmacy_user_service.customerDto.request.CustomerRequestDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.request.LoginRequestDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.request.PasswordReqestDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.request.RegisterDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.response.AddressDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.response.CustomerResponseDTO;
+import com.epharmacy.pharmacy_user_service.customerDto.response.LoginResponseDTO;
 
 public interface CustomerService {
 	
 	 String registration(RegisterDTO registerdto);
 	 
-	LoginResponseDTO login(LoginRequestDTO logindto);
+	String login(LoginRequestDTO logindto);
+	
+	CustomerResponseDTO viewProfile(Long customerId);
+	
+	String updateProfile(Long customerId,CustomerRequestDTO customerRequestdto);
+	
+	List<AddressDTO> viewAddress(Long customerId);
+	
+	String addAddress(Long customerId , AddressDTO address);
 	 
+	String changePassword(Long customerId,PasswordReqestDTO passwordRequestdto );
+	
+	
 
 }
