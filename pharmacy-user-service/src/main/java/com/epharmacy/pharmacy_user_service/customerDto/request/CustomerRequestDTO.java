@@ -18,7 +18,6 @@ import lombok.Setter;
 public class CustomerRequestDTO {
 
 	private String customerName;
-	private String customerEmailId;
 	private String contactNumber;
 	private Gender gender;
 	

@@ -22,5 +22,5 @@ server:
   port: 8080
   
 jwt:
-  secret: QWxhZGRpbjpPcGVuU2VzYW1lQWxhZGRpbjpPcGVuU2VzYW1lMTIzNDU2Nzg5  
+  secret: ${JWT_SECRET} 
   

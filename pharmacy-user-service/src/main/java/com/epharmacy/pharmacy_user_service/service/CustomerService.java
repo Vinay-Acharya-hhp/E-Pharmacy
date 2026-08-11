@@ -2,13 +2,14 @@ package com.epharmacy.pharmacy_user_service.service;
 
 import java.util.List;
 
+
 import com.epharmacy.pharmacy_user_service.customerDto.request.CustomerRequestDTO;
 import com.epharmacy.pharmacy_user_service.customerDto.request.LoginRequestDTO;
 import com.epharmacy.pharmacy_user_service.customerDto.request.PasswordReqestDTO;
 import com.epharmacy.pharmacy_user_service.customerDto.request.RegisterDTO;
 import com.epharmacy.pharmacy_user_service.customerDto.response.AddressDTO;
 import com.epharmacy.pharmacy_user_service.customerDto.response.CustomerResponseDTO;
-import com.epharmacy.pharmacy_user_service.customerDto.response.LoginResponseDTO;
+
 
 public interface CustomerService {
 	
@@ -24,7 +25,7 @@ public interface CustomerService {
 	
 	String addAddress(Long customerId , AddressDTO address);
 	 
-	String changePassword(Long customerId,PasswordReqestDTO passwordRequestdto );
+	String changePassword(String email ,PasswordReqestDTO passwordRequestdto );
 	
 	
 

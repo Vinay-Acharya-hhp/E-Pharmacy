@@ -2,6 +2,7 @@ package com.epharmacy.pharmacy_user_service.controler;
 
 import java.util.List;
 
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class CustomerControler {
 		HttpHeaders headers=new HttpHeaders();
 		headers.setBearerAuth(token);
 		
-		return ResponseEntity.status(HttpStatus.OK).headers(headers).body("Login Successful"+token);
+		return ResponseEntity.status(HttpStatus.OK).headers(headers).body(token);
 	}
 	
 
@@ -72,7 +73,7 @@ public class CustomerControler {
 	public ResponseEntity<ApiResponse<List<AddressDTO>>> viewAddress(@PathVariable Long customerId) {
 		List<AddressDTO> data= service.viewAddress(customerId);
 		 ApiResponse<List<AddressDTO>> response=new ApiResponse<>(data,true,200);
-			return new ResponseEntity<>(response,HttpStatus.CREATED);
+			return new ResponseEntity<>(response,HttpStatus.OK);
 		
 	}
 
@@ -81,14 +82,15 @@ public class CustomerControler {
 	public ResponseEntity<ApiResponse<String>> add_Address(@PathVariable Long customerId, @RequestBody AddressDTO address) {
 		 String data=service.addAddress(customerId, address);
 		 ApiResponse<String> response=new ApiResponse<>(data,true,201);
-		return new ResponseEntity<>(response,HttpStatus.OK);
+		return new ResponseEntity<>(response,HttpStatus.CREATED);
 	}
 
 
-	
-	public String changePassword(Long id,PasswordReqestDTO passwordRequestdto) {
-		// TODO Auto-generated method stub
-		return null;
+	@PutMapping("/change-password/{email}")
+	public ResponseEntity<ApiResponse<String>> changePassword(@PathVariable String email,@RequestBody PasswordReqestDTO passwordRequestdto) {
+		String data=service.changePassword(email, passwordRequestdto);
+		ApiResponse<String> response= new ApiResponse<>(data,true,200);
+		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 
 

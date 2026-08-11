@@ -21,9 +21,9 @@ public class GlobalExceptionHandler {
 				
 				e.getMessage(),
 				false,
-				HttpStatus.NOT_FOUND.value()
+				HttpStatus.BAD_REQUEST.value()
 				);
-		return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -66,7 +66,17 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
+	@ExceptionHandler(PasswordException.class)
+	public ResponseEntity<ApiResponse<?>> handlePasswordException(PasswordException e)
+	{
+		
+		ApiResponse<?> response=new ApiResponse<>(
+				e.getMessage(),
+				false,
+				HttpStatus.BAD_REQUEST.value()
+				);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+	}
 	
 	
 }
