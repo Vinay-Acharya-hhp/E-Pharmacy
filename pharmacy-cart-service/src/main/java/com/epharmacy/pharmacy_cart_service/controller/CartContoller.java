@@ -57,7 +57,7 @@ public ResponseEntity<ApiResponse<CartResponseDto>> updateQuantity(@PathVariable
 	return new ResponseEntity<>(response,HttpStatus.OK);
 }
 	@DeleteMapping("/deletecart/{customerId}")
- public <T> ResponseEntity<ApiResponse> deleteMedicine(@PathVariable Long medicineId, @PathVariable Long customerId) {
+ public  ResponseEntity<ApiResponse> deleteMedicine(@PathVariable Long medicineId, @PathVariable Long customerId) {
 	 service.deleteMedicine(medicineId, customerId);
 	ApiResponse response=new ApiResponse<>("Cart Item Deleted",true,HttpStatus.OK.value());
 	return new ResponseEntity<>(response,HttpStatus.OK);
