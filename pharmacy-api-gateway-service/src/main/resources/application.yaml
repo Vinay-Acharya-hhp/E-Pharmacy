@@ -4,26 +4,31 @@ spring:
 
   cloud:
     gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true
+          enabled: true
+
       server:
         webmvc:
           routes:
             - id: customer-service
-              uri: http://localhost:8081
+              uri: lb://PHARMACY-USER-SERVICE
               predicates:
                 - Path=/customer/**
 
             - id: medicine-service
-              uri: http://localhost:8082
+              uri: lb://PHARMACY-MEDICINE-SERVICE
               predicates:
                 - Path=/medicine/**
 
             - id: cart-service
-              uri: http://localhost:8083
+              uri: lb://PHARMACY-CART-SERVICE
               predicates:
                 - Path=/cart/**
 
             - id: order-service
-              uri: http://localhost:8084
+              uri: lb://PHARMACY-ORDER-SERVICE
               predicates:
                 - Path=/order/**
 

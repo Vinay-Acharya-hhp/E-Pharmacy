@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: pharmacy-eureka-server
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetch-registry: false
+    register-with-eureka: false
