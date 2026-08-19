@@ -13,7 +13,7 @@ import com.epharmacy.pharmacy_user_service.customerDto.response.CustomerResponse
 @FeignClient(name="PHARMACY-ORDER-SERVICE")
 public interface OrderClient {
 
-	@GetMapping("/view-order/customer/{customerId}")
+	@GetMapping("/order/view-order/customer/{customerId}")
 	 ResponseEntity<com.epharmacy.pharmacy_user_service.apiResponse.ApiResponse<List<CustomerResponseDTO>>>
 	               getCustomerorders(@PathVariable("customerId") Long customerId);
 }

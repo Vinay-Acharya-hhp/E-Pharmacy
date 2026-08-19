@@ -14,8 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlaceOrderRequestDto {
 	
-	@NotNull
-	private Long customerId;
+
 	@NotNull
 	private Long addressId;
 	@NotNull

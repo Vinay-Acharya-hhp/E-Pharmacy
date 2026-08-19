@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
+
 public class OrderResponseDto {
 
 	private Long orderId;
@@ -24,4 +25,8 @@ public class OrderResponseDto {
 	private OrderStatus orderStatus;
 	private DeliveryStatus deliveryStatus;
 	private String cancelReson;
+	
+	
+	
+	
 }

@@ -3,9 +3,11 @@ package com.epharmacy.pharmacy_cart_service.dto.responsedto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CartResponseDto {
 	private Long cartId;
 	

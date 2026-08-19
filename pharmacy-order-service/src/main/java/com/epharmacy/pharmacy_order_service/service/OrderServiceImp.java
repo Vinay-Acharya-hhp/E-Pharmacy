@@ -7,12 +7,16 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.epharmacy.pharmacy_order_service.apiResponse.ApiResponse;
 import com.epharmacy.pharmacy_order_service.dto.requestdto.CancelOrderRequestDto;
 import com.epharmacy.pharmacy_order_service.dto.requestdto.PlaceOrderRequestDto;
+import com.epharmacy.pharmacy_order_service.dto.responsedto.AddressDTO;
 import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderResponseDto;
 import com.epharmacy.pharmacy_order_service.entity.DeliveryStatus;
 import com.epharmacy.pharmacy_order_service.entity.Order;
 import com.epharmacy.pharmacy_order_service.entity.OrderStatus;
+import com.epharmacy.pharmacy_order_service.exception.AddressNotFoundException;
+import com.epharmacy.pharmacy_order_service.feignclient.CustomerAddressFeignClient;
 import com.epharmacy.pharmacy_order_service.repository.OrderItemrepo;
 import com.epharmacy.pharmacy_order_service.repository.OrderRepo;
 
@@ -22,18 +26,30 @@ public class OrderServiceImp implements OrderService{
 	private OrderRepo orderrepo;
 	private OrderItemrepo orderItemrepo;
 	private ModelMapper modelmapper;
+	private CustomerAddressFeignClient customerAddressFeignClient;
 	
 
-	public OrderServiceImp(OrderRepo orderrepo, OrderItemrepo orderItemrepo, ModelMapper modelmapper) {
+	public OrderServiceImp(OrderRepo orderrepo, OrderItemrepo orderItemrepo,
+			ModelMapper modelmapper,CustomerAddressFeignClient customerAddressFeignClient) {
 		this.orderrepo = orderrepo;
 		this.orderItemrepo = orderItemrepo;
 		this.modelmapper = modelmapper;
+		this.customerAddressFeignClient=customerAddressFeignClient;
 	}
 
 	@Override
-	public OrderResponseDto placeorder(PlaceOrderRequestDto placeorderRequestdto) {
+	public OrderResponseDto placeorder(Long customerId,PlaceOrderRequestDto placeorderRequestdto) {
+		
+		ApiResponse<AddressDTO> address = customerAddressFeignClient
+				 .getaddress(placeorderRequestdto.getAddressId(), customerId);
+		if (address == null || address.getData() == null) {
+	        throw new AddressNotFoundException("Address not found for customer " + customerId);
+	    }
+
+			        
+			       
 		Order order=new Order();
-		order.setCustomerId(placeorderRequestdto.getCustomerId());
+		order.setCustomerId(customerId);
 		order.setAddressId(placeorderRequestdto.getAddressId());
 		order.setOrdervalueBeforeDiscount(placeorderRequestdto.getOrderValueBeforeDiscount());
 		double discount=calculatediscount(placeorderRequestdto.getOrderValueBeforeDiscount());

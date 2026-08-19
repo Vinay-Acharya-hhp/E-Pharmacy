@@ -25,7 +25,9 @@ public interface CustomerService {
 	
 	String addAddress(Long customerId , AddressDTO address);
 	 
-	String changePassword(String email ,PasswordReqestDTO passwordRequestdto );
+	String changePassword(Long customerId ,PasswordReqestDTO passwordRequestdto );
+	
+	AddressDTO getaddress(Long addressId,Long customerId);
 	
 	
 

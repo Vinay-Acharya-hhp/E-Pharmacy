@@ -31,6 +31,12 @@ public class JWTService {
         return extractAllClaims(token).getSubject();
     }
 
+    public Long extractCustomerId(String token) {
+
+        return extractAllClaims(token)
+                .get("id", Long.class);
+    }
+
     private Claims extractAllClaims(String token) {
 
         return Jwts.parser()
@@ -59,5 +65,4 @@ public class JWTService {
         }
     }
 }
-
 

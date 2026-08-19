@@ -54,9 +54,9 @@ public class MedicineController {
 		ApiResponse<Page <MedicineResponseDTO>> response=new ApiResponse<>(data,true,200);
 		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
-    @GetMapping("/getbyid/{id}")
-	public ResponseEntity<ApiResponse<MedicineResponseDTO>> getById(@PathVariable Long id) {
-	 	MedicineResponseDTO data=service.getById(id);
+    @GetMapping("/getbyid/{medicineId}")
+	public ResponseEntity<ApiResponse<MedicineResponseDTO>> getById(@PathVariable Long medicineId) {
+	 	MedicineResponseDTO data=service.getById(medicineId);
 			ApiResponse <MedicineResponseDTO> response=new ApiResponse<>(data,true,200);
 			return new ResponseEntity<>(response,HttpStatus.OK);
 	}

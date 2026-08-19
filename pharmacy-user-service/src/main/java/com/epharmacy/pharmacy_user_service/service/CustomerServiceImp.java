@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import com.epharmacy.pharmacy_user_service.entity.Address;
 import com.epharmacy.pharmacy_user_service.entity.Customer;
 import com.epharmacy.pharmacy_user_service.exception.PasswordException;
 import com.epharmacy.pharmacy_user_service.exception.ResourceAlreadyExistsException;
+import com.epharmacy.pharmacy_user_service.exception.ResourceNotFoundException;
 import com.epharmacy.pharmacy_user_service.exception.UserNotFoundException;
 import com.epharmacy.pharmacy_user_service.repository.AddressRepo;
 import com.epharmacy.pharmacy_user_service.repository.CustomerRepository;
@@ -82,32 +84,43 @@ public class CustomerServiceImp implements CustomerService {
 		 return "Registration Successfull";
 	}
 	
-    @Override
-    public String login(LoginRequestDTO loginDto) {
+	@Override
+	public String login(LoginRequestDTO loginDto) {
 
-        String normalizedEmail = loginDto.getCustomerEmailId()
-                .trim()
-                .toLowerCase();
+	    String normalizedEmail = loginDto.getCustomerEmailId()
+	            .trim()
+	            .toLowerCase();
 
-        try {
-            Authentication authentication =
-                    authManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    normalizedEmail,
-                                    loginDto.getPassword()
-                            )
-                    );
+	    try {
 
-            if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(normalizedEmail);
-            }
+	        Authentication authentication =
+	                authManager.authenticate(
+	                        new UsernamePasswordAuthenticationToken(
+	                                normalizedEmail,
+	                                loginDto.getPassword()
+	                        )
+	                );
 
-            throw new BadCredentialsException("Invalid email or password");
+	        if (authentication.isAuthenticated()) {
 
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid email or password");
-        }
-    }
+	            Customer customer = repo
+	                    .findByCustomerEmailId(normalizedEmail)
+	                    .orElseThrow(() ->
+	                            new UsernameNotFoundException("Customer not found"));
+
+	            return jwtService.generateToken(
+	                    customer.getId(),
+	                    customer.getCustomerEmailId()
+	            );
+	        }
+
+	        throw new BadCredentialsException("Invalid email or password");
+
+	    } catch (BadCredentialsException e) {
+
+	        throw new BadCredentialsException("Invalid email or password");
+	    }
+	}
 //	public String login(LoginRequestDTO logindto) {
 //    	
 //    	String normalizedEmail = logindto.getCustomerEmailId().trim().toLowerCase();
@@ -138,10 +151,11 @@ public class CustomerServiceImp implements CustomerService {
 
 	@Override
 	public String updateProfile(Long customerId, CustomerRequestDTO customerRequestdto) {
+
 		Customer customer = repo.findById(customerId).orElseThrow(()->new UserNotFoundException("user Not Found"));
-		customer.setCustomerName(customerRequestdto.getContactNumber());
+		customer.setCustomerName(customerRequestdto.getCustomerName());
 		customer.setGender(customerRequestdto.getGender());
-		//customer.setCustomerEmailId(customerRequestdto.getCustomerEmailId());
+		customer.setContactNumber(customerRequestdto.getContactNumber());
 		repo.save(customer);
 		return "profile updated successfully";
 	}
@@ -177,8 +191,9 @@ public class CustomerServiceImp implements CustomerService {
 
 
 	@Override
-	public String changePassword(String email,PasswordReqestDTO passwordRequestdto) {
-		Customer customer = repo.findByCustomerEmailId(email)
+	public String changePassword(Long customerId,PasswordReqestDTO passwordRequestdto) {
+		
+		Customer customer = repo.findById(customerId)
 				.orElseThrow(()-> new UserNotFoundException("User Not found"));
 		if(!passwordencoder.matches(passwordRequestdto.getOldPassword(), customer.getPassword())) {
 			throw new PasswordException("Old password is Incorrect");
@@ -193,6 +208,15 @@ public class CustomerServiceImp implements CustomerService {
 		String encode=passwordencoder.encode(passwordRequestdto.getNewPassword());
 		customer.setPassword(encode);
 		return "password changed succesfully ";
+	}
+
+
+	@Override
+	public AddressDTO getaddress(Long addressId,Long customerId) {
+		Address address=addressrepo.findByIdAndCustomer_Id(addressId, customerId)
+				.orElseThrow(()->new ResourceNotFoundException("Address Not found for"+customerId));
+		
+		return modelmapper.map(address, AddressDTO.class);
 	}
 
 }

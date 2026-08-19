@@ -37,4 +37,16 @@ public class GlobalExceptionHandler {
 				);
 		return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@ExceptionHandler(AddressNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleAddressNotFoundException(AddressNotFoundException e)
+	{
+		
+		ApiResponse<?> response=new ApiResponse<>(
+				e.getMessage(),
+				false,
+				HttpStatus.NOT_FOUND.value()
+				);
+		return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+	}
 }

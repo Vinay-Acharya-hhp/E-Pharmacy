@@ -7,7 +7,7 @@ import com.epharmacy.pharmacy_order_service.dto.requestdto.PlaceOrderRequestDto;
 import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderResponseDto;
 
 public interface OrderService {
-OrderResponseDto placeorder(PlaceOrderRequestDto placeorderRequestdto);
+OrderResponseDto placeorder(Long customerId,PlaceOrderRequestDto placeorderRequestdto);
 List<OrderResponseDto> getCustomerorders(Long customerId);
 OrderResponseDto cancelOrder(Long orderId,CancelOrderRequestDto cabcelOrderrequestdto);
 

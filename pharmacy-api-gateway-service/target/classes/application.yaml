@@ -15,13 +15,11 @@ spring:
             - id: customer-service
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
-                - Path=/customer/**
-
+                - Path=/customer/**	
             - id: medicine-service
               uri: lb://PHARMACY-MEDICINE-SERVICE
               predicates:
                 - Path=/medicine/**
-
             - id: cart-service
               uri: lb://PHARMACY-CART-SERVICE
               predicates:

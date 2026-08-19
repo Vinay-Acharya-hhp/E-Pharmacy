@@ -31,14 +31,14 @@ public class SecurityConfiguration {
 
 	                .authorizeHttpRequests(req -> req
 
-//	                        // GET medicine is public
-//	                        .requestMatchers(
-//	                                HttpMethod.GET,
-//	                                "/cart/**"
-//	                        ).permitAll()
+	                        // GET medicine is public
+	                        .requestMatchers(
+	                               
+	                                "/order/**"
+	                        ).permitAll()
 
 	                        // Everything else requires authentication
-	                        .anyRequest().authenticated()
+	                        //.anyRequest().authenticated()
 	                )
 
 	                .sessionManagement(session ->
