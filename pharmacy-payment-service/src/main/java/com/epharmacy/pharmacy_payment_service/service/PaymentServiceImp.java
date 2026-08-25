@@ -1,0 +1,255 @@
+package com.epharmacy.pharmacy_payment_service.service;
+
+import java.time.LocalDate;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
+import com.epharmacy.pharmacy_payment_service.apiresponse.ApiResponse;
+import com.epharmacy.pharmacy_payment_service.dto.requestdto.CardPaymentRequestDto;
+import com.epharmacy.pharmacy_payment_service.dto.requestdto.PaymentRequestDto;
+import com.epharmacy.pharmacy_payment_service.dto.responsedto.CardResponseDto;
+import com.epharmacy.pharmacy_payment_service.dto.responsedto.OrderPaymentResponseDto;
+import com.epharmacy.pharmacy_payment_service.dto.responsedto.PaymentResponseDto;
+import com.epharmacy.pharmacy_payment_service.entity.Card;
+import com.epharmacy.pharmacy_payment_service.entity.Payment;
+import com.epharmacy.pharmacy_payment_service.entity.PaymentStatus;
+import com.epharmacy.pharmacy_payment_service.exception.CardNotFoundException;
+import com.epharmacy.pharmacy_payment_service.feignClient.OrderFeignClient;
+import com.epharmacy.pharmacy_payment_service.repo.Cardrepo;
+
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class PaymentServiceImp implements PaymentService {
+	
+	//private final PaymentRepo repo;
+	private final ModelMapper modelmapper;
+	private final OrderFeignClient orderFeignClient;
+	private final Cardrepo cardrepo;
+
+	public PaymentServiceImp(ModelMapper modelmapper
+			,OrderFeignClient orderFeignClient,Cardrepo cardrepo) {
+		//this.repo = repo;
+		this.modelmapper=modelmapper;
+		this.orderFeignClient=orderFeignClient;
+		this.cardrepo=cardrepo;
+	}
+	
+	
+	
+	@Override
+	public PaymentResponseDto makePayment(Double amountTopay, PaymentRequestDto paymentRequestDto) {
+		 // 1. Find card belonging to customer
+        Card card = cardrepo
+                .findByCardIdAndCustomerId(
+                		paymentRequestDto.getCardId(),
+                		paymentRequestDto.getCustomerId())
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Invalid cardId or customerId"));
+
+        // 2. Validate CVV
+        if (!card.getCvv().equals(paymentRequestDto.getCvv())) {
+            throw new IllegalArgumentException("Invalid CVV");
+        }
+
+        // 3. Validate expiry date
+        if (card.getExpiryDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "Card has expired");
+        }
+
+        // 4. Validate amount
+        if (amountTopay == null || amountTopay <= 0) {
+            throw new IllegalArgumentException(
+                    "Invalid payment amount");
+        }
+
+        // 5. Payment successful
+        String transactionId =
+                "TXN-" + UUID.randomUUID();
+
+        return new PaymentResponseDto(
+                true,
+                "Payment made successfully",
+                transactionId);
+    }
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//
+//@Override
+//@Transactional
+//	public PaymentResponseDto processPayment(PaymentRequestDto request) {
+//
+//	   
+//
+//	OrderPaymentResponseDto response= orderFeignClient.getidamount(request.getOrderId()).getData();
+//	
+//	        boolean paymentSuccessful =
+//	                simulatePayment(request);
+//
+//	        if (!paymentSuccessful) {
+//
+//	            return new PaymentResponseDto(
+//	                    null,
+//	                    response.getOrderId(),
+//	                    response.getAmount(),
+//	                    "FAILED",
+//	                    "Payment failed"
+//	            );
+//	        }
+//
+//	        // -----------------------------
+//	        // 6. Save payment
+//	        // -----------------------------
+//
+//	        Payment payment =
+//	                new Payment();
+//
+//	        payment.setOrderId(
+//	                response.getOrderId()
+//	        );
+//
+//	        payment.setCustomerId(
+//	                request.getCustomerId()
+//	        );
+//
+//	        payment.setAmount(
+//	                response.getAmount()
+//	        );
+//
+//	        String cardNumber =
+//	                request.getCardNumber();
+//
+//            payment.setCardNumber(cardNumber);
+//	        payment.setExpiryMonth(
+//	                request.getExpiryMonth()
+//	        );
+//
+//	        payment.setExpiryYear(
+//	                request.getExpiryYear()
+//	        );
+//
+//	        payment.setStatus(
+//	                PaymentStatus.SUCCESS
+//	        );
+//
+//	        payment.setCreatedAt(
+//	                LocalDateTime.now()
+//	        );
+//
+//	        Payment savedPayment =
+//	                repo.save(payment);
+//
+//	        // -----------------------------
+//	        // 7. Tell Order Service
+//	        // -----------------------------
+//
+//	        orderFeignClient.paymentSuccess(
+//	                savedPayment.getOrderId(),
+//	                savedPayment.getPaymentId()
+//	        );
+//
+//	        // -----------------------------
+//	        // 8. Response
+//	        // -----------------------------
+//
+//	        return new PaymentResponseDto(
+//	                savedPayment.getPaymentId(),
+//	                savedPayment.getOrderId(),
+//	                savedPayment.getAmount(),
+//	                "SUCCESS",
+//	                "Payment successful"
+//	        );
+//	    }
+//
+//
+//	    private boolean simulatePayment(
+//	            PaymentRequestDto request) {
+//
+//	        /*
+//	         * Demo payment.
+//	         *
+//	         * In a real system this would be
+//	         * handled by a payment gateway.
+//	         */
+//
+//	        return true;
+//	    }
+//	    
+//
+//
+
+
+	
+//
+//	@Override
+//	public String makePayment(Long customerId,Double amountToPay, PaymentRequestDto paymentRequestDto) {
+//		if(amountToPay==null || amountToPay<=0) {
+//			throw new IllegalArgumentException("Amount must be greater than zero");
+//		}
+//		if(paymentRequestDto==null) {
+//			throw new CardNotFoundException("Payment details cannot be null");
+//		}
+//		Card card=cardrepo.findById(paymentRequestDto.getCardNumber())
+//				.orElseThrow(()-> new CardNotFoundException("Payment details cannot be null") );
+//		if(card.getCustomerId()!=customerId) {
+//			throw new CardNotFoundException("Card does not belong to this customer");
+//		}
+//		if(card.getExpiryDate().isBefore(LocalDate.now())) {
+//			throw new CardNotFoundException("Card has expired");
+//			
+//		}
+//		return "Payment of Rs." +amountToPay +" successful";
+//	}
+
+
+	
+	@Override
+	public CardResponseDto addCard(Long customerId, CardPaymentRequestDto cardPaymentRequestDto) {
+		if(customerId==null) {
+			throw new CardNotFoundException("Customer Not found");
+		}
+		if(cardrepo.existsById(cardPaymentRequestDto.getCardId())) {
+			throw new CardNotFoundException("Card Already Exists");
+		}
+		Card card= modelmapper.map(cardPaymentRequestDto, Card.class);
+		card.setCustomerId(customerId);
+		Card save=cardrepo.save(card);
+		return modelmapper.map(save, CardResponseDto.class);
+	}
+
+	@Override
+	public List<CardResponseDto> viewCards(Long customerId) {
+		if(customerId==null) {
+			throw new CardNotFoundException("Customer Not found");
+		}
+		List<Card> cards=cardrepo.findByCustomerId(customerId);
+		if(cards.isEmpty()) {
+			throw new CardNotFoundException("Card Not found");
+		}
+		
+		return cards.stream().map(card ->modelmapper
+				.map(card,CardResponseDto.class ))
+				.toList();
+	}
+
+
+	}

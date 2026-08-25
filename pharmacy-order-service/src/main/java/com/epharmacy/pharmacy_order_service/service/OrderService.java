@@ -4,11 +4,18 @@ import java.util.List;
 
 import com.epharmacy.pharmacy_order_service.dto.requestdto.CancelOrderRequestDto;
 import com.epharmacy.pharmacy_order_service.dto.requestdto.PlaceOrderRequestDto;
+import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderPaymentResponseDto;
 import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderResponseDto;
 
 public interface OrderService {
 OrderResponseDto placeorder(Long customerId,PlaceOrderRequestDto placeorderRequestdto);
 List<OrderResponseDto> getCustomerorders(Long customerId);
 OrderResponseDto cancelOrder(Long orderId,CancelOrderRequestDto cabcelOrderrequestdto);
+void paymentSuccess(
+        Long orderId,
+        Long paymentId
+);
+
+OrderPaymentResponseDto getidamount(Long orderId);
 
 }

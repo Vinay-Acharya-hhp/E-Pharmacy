@@ -14,6 +14,8 @@ import com.epharmacy.pharmacy_medicine_service.entity.Medicine;
 import com.epharmacy.pharmacy_medicine_service.exception.MedicineNotFoundException;
 import com.epharmacy.pharmacy_medicine_service.repository.MedicineRepo;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class MedicineServiceImp implements MedicineService {
 	
@@ -32,6 +34,7 @@ public class MedicineServiceImp implements MedicineService {
 		
 		Medicine medicine=modelemapper.map(medicineReq, Medicine.class);
 		Medicine save=repo.save(medicine);
+		
 		return modelemapper.map(save, MedicineResponseDTO.class);
 	}
 
@@ -59,6 +62,33 @@ public class MedicineServiceImp implements MedicineService {
 		                   
 		
 		return modelemapper.map(medicine, MedicineResponseDTO.class);
+	}
+
+	@Override
+	@Transactional
+	public void updateStock(Long medicineId, Integer orderedQuantity) {
+
+	    if (orderedQuantity == null || orderedQuantity <= 0) {
+	        throw new IllegalArgumentException(
+	                "Ordered quantity must be greater than 0");
+	    }
+
+	    Medicine medicine = repo.findById(medicineId)
+	            .orElseThrow(() ->
+	                    new MedicineNotFoundException(
+	                            "Medicine with id " + medicineId + " not found"));
+
+	    if (medicine.getQuantity() < orderedQuantity) {
+	        throw new IllegalArgumentException(
+	                "Insufficient stock. Available quantity: "
+	                        + medicine.getQuantity());
+	    }
+
+	    medicine.setQuantity(
+	            medicine.getQuantity() - orderedQuantity
+	    );
+
+	    repo.save(medicine);
 	}
 	
 

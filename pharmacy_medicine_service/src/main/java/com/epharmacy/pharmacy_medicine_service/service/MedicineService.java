@@ -15,5 +15,5 @@ public interface MedicineService {
 	
 	Page <MedicineResponseDTO> getAllbycatogary(String catogery,int number,int size);
 	MedicineResponseDTO getById(Long id);
-
+    void updateStock(Long medicineId , Integer quantity);
 }

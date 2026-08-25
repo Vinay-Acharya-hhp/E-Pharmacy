@@ -15,7 +15,7 @@ import lombok.Setter;
 public class AddressDTO {
   
 
-	
+	private Long id;
 	private String addressName;
 	private String addressLine1;
 	private String addressLine2;

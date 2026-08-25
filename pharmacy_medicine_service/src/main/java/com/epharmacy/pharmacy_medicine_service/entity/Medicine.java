@@ -31,6 +31,7 @@ public class Medicine {
 	private String category;
 	private LocalDate manufacturing_Date;
 	private LocalDate expirey_Date;
+	private Integer quantity;
 	private double price;
 	private int discountPercent;
 

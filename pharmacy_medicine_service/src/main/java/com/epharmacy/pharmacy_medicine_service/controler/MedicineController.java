@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,7 +62,13 @@ public class MedicineController {
 			return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 
-
+    @PutMapping("/update-stock/{medicineId}")
+    public ResponseEntity<ApiResponse<String>> updateStock(@PathVariable Long medicineId, 
+    		@RequestBody Integer orderedQuantity) {
+     	service.updateStock(medicineId, orderedQuantity);
+     	ApiResponse <String> response=new ApiResponse<>("stock updated",true,200);
+		return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 	
 	
 	

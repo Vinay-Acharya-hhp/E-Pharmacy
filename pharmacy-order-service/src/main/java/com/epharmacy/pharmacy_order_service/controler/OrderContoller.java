@@ -2,6 +2,7 @@ package com.epharmacy.pharmacy_order_service.controler;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,25 +12,25 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.epharmacy.pharmacy_order_service.apiResponse.ApiResponse;
 import com.epharmacy.pharmacy_order_service.configuration.JWTService;
 import com.epharmacy.pharmacy_order_service.dto.requestdto.CancelOrderRequestDto;
 import com.epharmacy.pharmacy_order_service.dto.requestdto.PlaceOrderRequestDto;
+import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderPaymentResponseDto;
 import com.epharmacy.pharmacy_order_service.dto.responsedto.OrderResponseDto;
 import com.epharmacy.pharmacy_order_service.service.OrderService;
 
 @RestController
 @RequestMapping("/order")
 public class OrderContoller {
+	@Autowired
 	private OrderService service;
+	@Autowired
 	private JWTService jwtService;
 	
-	public OrderContoller(OrderService service,JWTService jwtService) {
-		this.service = service;
-		this.service=service;
-	}
 	@PostMapping("/place-order")
 	public ResponseEntity<ApiResponse<OrderResponseDto>> placeorder
 	(@RequestHeader("Authorization")String authorization,
@@ -55,6 +56,26 @@ public class OrderContoller {
 		OrderResponseDto data=service.cancelOrder(orderId, cabcelOrderrequestdto);
 		ApiResponse<OrderResponseDto> response=new ApiResponse<>(data,true,200);
 		return new ResponseEntity<>(response,HttpStatus.OK);
+	}
+	
+	@PutMapping("/{orderId}/payment-success")
+	public ResponseEntity<ApiResponse<String>> paymentSuccess(
+	        @PathVariable Long orderId,
+	        @RequestParam Long paymentId) {
+
+	    service.paymentSuccess(
+	            orderId,
+	            paymentId
+	    );
+	    String data=" Payment successful and order confirmed";
+	    ApiResponse<String> response=new ApiResponse<>(data,true,200);
+		return new ResponseEntity<>(response,HttpStatus.OK);
+	}
+	@GetMapping("/getorderid/{orderId}")
+	public ResponseEntity<ApiResponse<OrderPaymentResponseDto>> getidamount(@PathVariable Long orderId) {
+		OrderPaymentResponseDto data=service.getidamount(orderId);
+		 ApiResponse<OrderPaymentResponseDto> response=new ApiResponse<>(data,true,200);
+			return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 
 }

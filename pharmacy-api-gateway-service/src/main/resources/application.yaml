@@ -12,14 +12,17 @@ spring:
       server:
         webmvc:
           routes:
+
             - id: customer-service
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
-                - Path=/customer/**	
+                - Path=/customer/**
+
             - id: medicine-service
               uri: lb://PHARMACY-MEDICINE-SERVICE
               predicates:
                 - Path=/medicine/**
+
             - id: cart-service
               uri: lb://PHARMACY-CART-SERVICE
               predicates:
@@ -29,6 +32,11 @@ spring:
               uri: lb://PHARMACY-ORDER-SERVICE
               predicates:
                 - Path=/order/**
+
+            - id: payment-service
+              uri: lb://PHARMACY-PAYEMENT-SERVICE
+              predicates:
+                - Path=/payment/**
 
 server:
   port: 8080
