@@ -15,6 +15,7 @@ import com.epharmacy.pharmacy_medicine_service.entity.Medicine;
 public interface MedicineRepo extends JpaRepository<Medicine,Long>{
 	
    Page<Medicine>findByCategory(String category,Pageable pageable);
+   Page<Medicine> findByMedicineNameContainingIgnoreCase(String medicineName,Pageable pageable);
 
 	//List<Medicine> findByCategory(Sort by);
    

@@ -3,6 +3,8 @@ package com.epharmacy.pharmacy_payment_service.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,13 +32,13 @@ public class SecurityConfiguration {
 
 		                .authorizeHttpRequests(req -> req
 
-//		                        // GET medicine is public
-//		                        .requestMatchers(
-//		                               
-//		                                "/payment/**"
-//		                        ).permitAll()
+		                       
+		                        .requestMatchers(
+		                               
+		                                "/payment/**"
+		                        ).authenticated()
 
-		                        // Everything else requires authentication
+		                      
 		                        .anyRequest().authenticated()
 		                )
 
@@ -52,6 +54,13 @@ public class SecurityConfiguration {
 		                )
 
 		                .build();
+		    }
+		    
+		    @Bean
+		    public AuthenticationManager authenticationManager() {
+		        return authentication -> {
+		            throw new BadCredentialsException("Authentication not supported");
+		        };
 		    }
 		}
 

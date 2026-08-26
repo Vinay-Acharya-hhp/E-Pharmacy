@@ -60,11 +60,7 @@ public class OrderServiceImp implements OrderService{
 		        Long customerId,
 		        PlaceOrderRequestDto placeorderRequestdto) {
 
-		    System.out.println("Customer ID: " + customerId);
-		    System.out.println(
-		            "Address ID: "
-		                    + placeorderRequestdto.getDeliveryAddress().getAddressId()
-		    );
+		   
 
 		    ApiResponse<AddressDTO> addressResponse;
 

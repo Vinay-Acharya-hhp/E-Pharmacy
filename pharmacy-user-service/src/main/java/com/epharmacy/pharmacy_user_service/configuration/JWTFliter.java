@@ -44,8 +44,7 @@ public class JWTFliter extends OncePerRequestFilter {
                 token = authHeader.substring(7);
                 email = jwtService.extractUserName(token);
 
-                System.out.println("Token: " + token);
-                System.out.println("Email: " + email);
+               
             }
 
             if (email != null &&
@@ -55,8 +54,7 @@ public class JWTFliter extends OncePerRequestFilter {
                         userDetailsService.loadUserByUsername(email);
 
                 if (jwtService.validateToken(token, userDetails)) {
-                	System.out.print("Token valid");
-
+               
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails,
@@ -70,12 +68,15 @@ public class JWTFliter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext()
                             .setAuthentication(authToken);
 
-                    System.out.println("Authentication Success"+userDetails.getAuthorities());
+                    
                 }
             }
 
         } catch (Exception e) {
-            System.out.println("JWT Error: " + e.getMessage());
+        	 SecurityContextHolder.clearContext();
+
+             // Log internally
+             // log.error("JWT validation failed", e);
         }
 
         filterChain.doFilter(request, response);

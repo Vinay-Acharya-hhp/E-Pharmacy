@@ -90,6 +90,15 @@ public class MedicineServiceImp implements MedicineService {
 
 	    repo.save(medicine);
 	}
+
+	@Override
+	public Page<MedicineResponseDTO> serach(String medicineName, int number, int size) {
+		Page<Medicine> serachmedicine=repo.findByMedicineNameContainingIgnoreCase(medicineName,PageRequest.of(number, size));
+		//System.out.println( getbycatogory.getContent());
+		return serachmedicine
+				.map(medicine-> modelemapper.map(medicine,  MedicineResponseDTO.class));
+		
+	}
 	
 
 }

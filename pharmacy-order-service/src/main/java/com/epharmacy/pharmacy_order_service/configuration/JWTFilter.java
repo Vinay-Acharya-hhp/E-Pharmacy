@@ -43,8 +43,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 email = jwtService.extractUserName(token);
 
-                System.out.println("JWT received");
-                System.out.println("Customer: " + email);
+                
             }
 
             if (email != null &&
@@ -70,15 +69,17 @@ public class JWTFilter extends OncePerRequestFilter {
                             .getContext()
                             .setAuthentication(authToken);
 
-                    System.out.println("JWT VALID");
+                   
                 }
             }
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "JWT Error: " + e.getMessage()
-            );
+
+            SecurityContextHolder.clearContext();
+
+            // Log internally
+            // log.error("JWT validation failed", e);
         }
 
         filterChain.doFilter(request, response);

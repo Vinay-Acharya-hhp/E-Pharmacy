@@ -69,7 +69,15 @@ public class MedicineController {
      	ApiResponse <String> response=new ApiResponse<>("stock updated",true,200);
 		return new ResponseEntity<>(response,HttpStatus.OK);
     }
-	
-	
+    
+    @GetMapping("/serach/{medicineName}/{pagenumber}")
+	public ResponseEntity<ApiResponse<Page <MedicineResponseDTO>>> serach
+	                                              (@PathVariable String medicineName,
+	                                            	  @PathVariable("pagenumber") int pagenumber,
+	                                               @RequestParam(defaultValue="10")int size){
+    	Page<MedicineResponseDTO> data=service.serach(medicineName, pagenumber, size);
+		ApiResponse<Page <MedicineResponseDTO>> response=new ApiResponse<>(data,true,200);
+		return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 	
 }
