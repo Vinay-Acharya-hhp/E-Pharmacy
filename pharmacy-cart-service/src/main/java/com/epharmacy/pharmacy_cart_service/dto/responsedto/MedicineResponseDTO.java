@@ -18,4 +18,5 @@ public class MedicineResponseDTO {
 	private LocalDate expirey_Date;
 	private double price;
 	private int discountPercent;
+	private String imageUrl;
 }

@@ -34,5 +34,6 @@ public class Medicine {
 	private Integer quantity;
 	private double price;
 	private int discountPercent;
+	private String imageUrl;
 
 }
