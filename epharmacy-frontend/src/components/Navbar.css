@@ -1,0 +1,83 @@
+.nav {
+  background: var(--pine);
+  border-bottom: 3px solid var(--amber);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--parchment);
+}
+
+.nav__mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: var(--amber);
+  color: var(--pine-dark);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav__word {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav__link {
+  color: var(--sage-dim);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.nav__link:hover {
+  color: #fff;
+}
+
+.nav__cart {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav__cart-count {
+  background: var(--amber);
+  color: var(--pine-dark);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.nav .btn-ghost {
+  border-color: rgba(247, 243, 234, 0.35);
+  color: var(--parchment);
+}
+
+.nav .btn-ghost:hover {
+  border-color: var(--amber);
+}
