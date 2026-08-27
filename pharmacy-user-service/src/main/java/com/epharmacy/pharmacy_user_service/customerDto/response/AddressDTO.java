@@ -18,6 +18,7 @@ import lombok.Setter;
 public class AddressDTO {
   
 
+	private Long id;
 	@NotBlank(message="address is required")
 	private String addressName;
 	private String addressLine1;

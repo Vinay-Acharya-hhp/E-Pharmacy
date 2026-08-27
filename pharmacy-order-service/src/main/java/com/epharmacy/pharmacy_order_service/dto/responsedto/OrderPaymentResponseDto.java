@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class OrderPaymentResponseDto {
 	
 	private Long orderId;
+	private Long customerId;
 	private double amount;
 	private OrderStatus orderStatus;
 

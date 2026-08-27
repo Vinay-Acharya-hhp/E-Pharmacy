@@ -16,8 +16,8 @@ import com.epharmacy.pharmacy_order_service.dto.responsedto.CartResponseDto;
 @FeignClient(name="PHARMACY-CART-SERVICE")
 public interface CartItemFeignClient {
 	@GetMapping("cart/getcart")
-	ApiResponse<List<CartResponseDto>> getCartMedicine(@RequestHeader("id")Long customerId);
+	ApiResponse<List<CartResponseDto>> getCartMedicine();
 	@DeleteMapping("cart/deleteallcart")
-	 public ResponseEntity<ApiResponse<String>> deleteAllMedicine
-	  ( @RequestHeader("id")Long customerId);
+	 public ResponseEntity<ApiResponse<String>> deleteAllMedicine();
 }
+ 

@@ -16,6 +16,7 @@ import com.epharmacy.pharmacy_payment_service.dto.responsedto.CardResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.OrderPaymentResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.PaymentResponseDto;
 import com.epharmacy.pharmacy_payment_service.entity.Card;
+import com.epharmacy.pharmacy_payment_service.entity.OrderStatus;
 import com.epharmacy.pharmacy_payment_service.entity.Payment;
 import com.epharmacy.pharmacy_payment_service.entity.PaymentStatus;
 import com.epharmacy.pharmacy_payment_service.exception.CardNotFoundException;
@@ -73,13 +74,41 @@ public class PaymentServiceImp implements PaymentService {
                     "Invalid payment amount");
         }
 
+        // 4b. Validate amount against the real order total
+        //     (never trust the client-supplied amount alone)
+        if (paymentRequestDto.getOrderId() != null) {
+            OrderPaymentResponseDto orderInfo =
+                    orderFeignClient
+                            .getidamount(paymentRequestDto.getOrderId())
+                            .getData();
+
+            if (orderInfo == null) {
+                throw new IllegalArgumentException(
+                        "Order not found");
+            }
+
+            if (!customerId.equals(orderInfo.getCustomerId())) {
+                throw new IllegalArgumentException(
+                        "Order does not belong to this customer");
+            }
+
+            if (orderInfo.getOrderStatus() != OrderStatus.PROCESSING) {
+                throw new IllegalArgumentException(
+                        "Order is not waiting for payment");
+            }
+
+            if (Math.abs(orderInfo.getAmount() - amountTopay) > 0.01) {
+                throw new IllegalArgumentException(
+                        "Payment amount does not match order total");
+            }
+        }
+
         // 5. Save the payment record
         Payment payment = new Payment();
         payment.setCardNumber(card.getCardId());
         payment.setOrderId(paymentRequestDto.getOrderId());
         payment.setCustomerId(customerId);
         payment.setAmount(amountTopay);
-        payment.setCvv(paymentRequestDto.getCvv());
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setCreatedAt(LocalDateTime.now());
 

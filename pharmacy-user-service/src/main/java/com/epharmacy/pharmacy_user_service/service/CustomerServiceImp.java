@@ -207,6 +207,7 @@ public class CustomerServiceImp implements CustomerService {
 		}
 		String encode=passwordencoder.encode(passwordRequestdto.getNewPassword());
 		customer.setPassword(encode);
+		repo.save(customer);
 		return "password changed succesfully ";
 	}
 

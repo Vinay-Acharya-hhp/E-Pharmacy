@@ -103,8 +103,7 @@ public class OrderServiceImp implements OrderService{
 		    try {
 
 		        cartResponse =
-		                cartItemFeignClient
-		                        .getCartMedicine(customerId);
+		                cartItemFeignClient.getCartMedicine();
 
 		    } catch (FeignException e) {
 
@@ -168,6 +167,16 @@ public class OrderServiceImp implements OrderService{
 		        MedicineResponseDTO medicine =
 		                medicineResponse.getData();
 
+		        if (medicine.getQuantity() == null
+		                || medicine.getQuantity() < cartItem.getQuantity()) {
+
+		            throw new IllegalStateException(
+		                    "Insufficient stock for "
+		                            + medicine.getMedicineName()
+		                            + ". Available quantity: "
+		                            + (medicine.getQuantity() == null ? 0 : medicine.getQuantity())
+		            );
+		        }
 
 		      
 		        OrderItem orderItem =
@@ -364,7 +373,9 @@ public class OrderServiceImp implements OrderService{
 	public OrderResponseDto cancelOrder(Long orderId, CancelOrderRequestDto cabcelOrderrequestdto) {
 		Order order =orderrepo.findById(orderId).orElseThrow();
 		if(order.getOrderStatus()!=OrderStatus.PROCESSING) {
-			
+			throw new IllegalStateException(
+					"Only orders in PROCESSING status can be cancelled"
+			);
 		}
 		order.setOrderStatus(OrderStatus.CANCELLED);
 		order.setDeliveryStatus(DeliveryStatus.CANCELLED);
@@ -424,9 +435,9 @@ public class OrderServiceImp implements OrderService{
 
 	    // 7. Get order items
 
-	    List<OrderItem> orderItems =
-	            orderItemrepo
-	                    .findByOrderItemId(orderId);
+	    List<OrderItem> orderItems = orderItemrepo
+                .findByOrder_OrderId(orderId);
+	            
 
 
 	    // 8. Reduce medicine quantity
@@ -442,9 +453,7 @@ public class OrderServiceImp implements OrderService{
 
 	    // 9. Clear customer's cart
 
-	    cartItemFeignClient.deleteAllMedicine(
-	            order.getCustomerId()
-	    );
+	    cartItemFeignClient.deleteAllMedicine();
 		
 	}
 
@@ -454,6 +463,7 @@ public class OrderServiceImp implements OrderService{
 		OrderPaymentResponseDto response=new OrderPaymentResponseDto();
 		response.setAmount(order.getFinalAmount());
 		response.setOrderId(order.getOrderId());
+		response.setCustomerId(order.getCustomerId());
 		response.setOrderStatus(order.getOrderStatus());
 		return response;
 	}

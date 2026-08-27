@@ -54,12 +54,12 @@ public class CartContoller {
 	
 	@GetMapping("/getcart")
 public ResponseEntity<ApiResponse<List<CartResponseDto>>> getCartMedicine
-                                         (@RequestHeader("id")Long customerId){
-//		String token =authorization.trim();
-//		if(token.startsWith("Bearer ")) {
-//			token=token.substring(7).trim();
-//		}
-//		Long customerId=jwtService.extractCustomerId(token);
+(@RequestHeader("Authorization")String authorization){
+		String token =authorization.trim();
+		if(token.startsWith("Bearer ")) {
+			token=token.substring(7).trim();
+		}
+		Long customerId=jwtService.extractCustomerId(token);
 	List<CartResponseDto> data=service.getCartMedicine(customerId);
 	ApiResponse<List<CartResponseDto>> response=new ApiResponse<>
 	                                         (data,true,HttpStatus.OK.value());
@@ -102,12 +102,12 @@ Long customerId=jwtService.extractCustomerId(token);
 	
     @DeleteMapping("/deleteallcart")
 	 public ResponseEntity<ApiResponse<String>> deleteAllMedicine
-	  ( @RequestHeader("id")Long customerId) {
-//    	String token =authorization.trim();
-//    	if(token.startsWith("Bearer ")) {
-//    	token=token.substring(7).trim();
-//    	}
-//    	Long customerId=jwtService.extractCustomerId(token);
+	 ( @RequestHeader("Authorization")String authorization) {
+    	String token =authorization.trim();
+    	if(token.startsWith("Bearer ")) {
+    	token=token.substring(7).trim();
+    	}
+    	Long customerId=jwtService.extractCustomerId(token);
 		 service.deleteAllMedicine( customerId);
 		ApiResponse response=new ApiResponse<>("Cart All Item Deleted",true,HttpStatus.OK.value());
 		return new ResponseEntity<>(response,HttpStatus.OK);

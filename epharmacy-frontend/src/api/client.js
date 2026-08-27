@@ -16,8 +16,12 @@ function makeClient(baseURL) {
   const instance = axios.create({ baseURL });
   instance.interceptors.request.use((config) => {
     const token = localStorage.getItem("epharmacy_token");
+    const customerId = localStorage.getItem("epharmacy_customer_id");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (customerId) {
+      config.headers.id = customerId;
     }
     return config;
   });

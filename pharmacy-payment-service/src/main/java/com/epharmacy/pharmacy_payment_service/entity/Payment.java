@@ -29,8 +29,6 @@ public class Payment {
 
     private double amount;
 
-    private String cvv;
-
     private String expiryMonth;
 
     private String expiryYear;

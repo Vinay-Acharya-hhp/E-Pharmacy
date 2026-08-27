@@ -25,15 +25,23 @@ export default function Navbar() {
             {count > 0 && <span className="nav__cart-count">{count}</span>}
           </Link>
           {isAuthenticated ? (
-            <button
-              className="btn btn-ghost"
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
-            >
-              Sign out{customerName ? ` (${customerName.split("@")[0]})` : ""}
-            </button>
+            <>
+              <Link to="/orders" className="nav__link">
+                Orders
+              </Link>
+              <Link to="/profile" className="nav__link">
+                {customerName ? customerName.split("@")[0] : "Profile"}
+              </Link>
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Sign out
+              </button>
+            </>
           ) : (
             <Link to="/login" className="btn btn-primary">
               Sign in

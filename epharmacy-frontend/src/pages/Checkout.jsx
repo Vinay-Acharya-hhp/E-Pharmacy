@@ -17,10 +17,10 @@ const emptyAddress = {
 
 const emptyCard = {
   cardId: "",
-  nameOncard: "",
-  cardType: "CREDIT",
+  nameOnCard: "",
+  cartType: "CREDIT",
   cvv: "",
-  expirydate: "",
+  expiryDate: "",
 };
 
 const STEP = { REVIEW: "review", PLACE: "place", PAY: "pay", DONE: "done" };
@@ -141,7 +141,7 @@ export default function Checkout() {
       await paymentApi.post(`/payment/amount/${order.amountPaid}`, {
         cardId: selectedCardId,
         nameOnCard: cards.find((c) => c.cardId === selectedCardId)?.nameOnCard,
-        cardType: cards.find((c) => c.cardId === selectedCardId)?.cardType,
+        cardType: cards.find((c) => c.cardId === selectedCardId)?.cartType,
         cvv: cvvInput,
         orderId: order.orderId,
       });
@@ -294,7 +294,7 @@ export default function Checkout() {
                       onChange={() => setSelectedCardId(c.cardId)}
                     />
                     <span>
-                      {c.nameOnCard} — card ending {c.cardId.slice(-4)} ({c.cardType})
+                      {c.nameOnCard} — card ending {c.cardId.slice(-4)} ({c.cartType})
                     </span>
                   </label>
                 ))}
@@ -321,8 +321,8 @@ export default function Checkout() {
                     <label>Name on card</label>
                     <input
                       required
-                      value={cardForm.nameOncard}
-                      onChange={(e) => setCardForm((f) => ({ ...f, nameOncard: e.target.value }))}
+                      value={cardForm.nameOnCard}
+                      onChange={(e) => setCardForm((f) => ({ ...f, nameOnCard: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -330,8 +330,8 @@ export default function Checkout() {
                   <div className="field">
                     <label>Type</label>
                     <select
-                      value={cardForm.cardType}
-                      onChange={(e) => setCardForm((f) => ({ ...f, cardType: e.target.value }))}
+                      value={cardForm.cartType}
+                      onChange={(e) => setCardForm((f) => ({ ...f, cartType: e.target.value }))}
                     >
                       <option value="CREDIT">Credit</option>
                       <option value="DEBIT">Debit</option>
@@ -351,8 +351,8 @@ export default function Checkout() {
                     <input
                       required
                       type="date"
-                      value={cardForm.expirydate}
-                      onChange={(e) => setCardForm((f) => ({ ...f, expirydate: e.target.value }))}
+                      value={cardForm.expiryDate}
+                      onChange={(e) => setCardForm((f) => ({ ...f, expiryDate: e.target.value }))}
                     />
                   </div>
                 </div>

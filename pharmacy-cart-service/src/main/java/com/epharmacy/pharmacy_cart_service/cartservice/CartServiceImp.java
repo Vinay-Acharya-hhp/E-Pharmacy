@@ -139,8 +139,8 @@ public class CartServiceImp implements CartService {
         );
 
         // Update quantity
-        cart.setQuantity(cart.getQuantity()+
-                updatequantityrequestdto.getQuantity()
+        cart.setQuantity(
+                         updatequantityrequestdto.getQuantity()
         );
 
         // Save
