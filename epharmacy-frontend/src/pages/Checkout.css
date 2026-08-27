@@ -1,0 +1,88 @@
+.checkout {
+  padding: 40px 20px 100px;
+  max-width: 640px;
+}
+
+.checkout h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  margin: 0 0 24px;
+}
+
+.checkout-section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+
+.checkout-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0 0 14px;
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.option-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.option-row input {
+  margin-top: 3px;
+}
+
+.inline-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-row .field {
+  flex: 1;
+}
+
+.inline-form__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.checkout-cta {
+  margin-top: 6px;
+}
+
+.checkout-amount {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.checkout-done {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.checkout-done h1 {
+  font-family: var(--font-display);
+  margin-bottom: 10px;
+}
+
+.checkout-done p {
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}

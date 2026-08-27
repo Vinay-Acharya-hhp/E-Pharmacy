@@ -15,7 +15,7 @@ public interface PaymentService {
 //	    );
 //	
 //	String makePayment(Long customerId,Double amountToPay,PaymentRequestDto paymentRequestDto );
-	PaymentResponseDto makePayment(Double amountTopay,PaymentRequestDto paymentRequestDto );
+	PaymentResponseDto makePayment(Long customerId, Double amountTopay,PaymentRequestDto paymentRequestDto );
 	CardResponseDto addCard(Long customerId,CardPaymentRequestDto card);
 	List<CardResponseDto> viewCards(Long customerId);
 

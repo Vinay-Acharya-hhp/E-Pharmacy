@@ -19,10 +19,6 @@ function makeClient(baseURL) {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    const customerId = localStorage.getItem("epharmacy_customer_id");
-    if (customerId) {
-      config.headers.id = customerId;
-    }
     return config;
   });
   return instance;

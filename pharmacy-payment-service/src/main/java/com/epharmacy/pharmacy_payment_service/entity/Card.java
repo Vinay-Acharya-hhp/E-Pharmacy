@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="catds")
+@Table(name="cards")
 public class Card {
 	@Id
 	private String cardId;

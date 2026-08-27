@@ -22,6 +22,7 @@ public class PaymentRequestDto {
 	    private String cvv;
 	    private LocalDate expiryMonth;
 	    private Long customerId;
+	    private Long orderId;
 
 	  
 

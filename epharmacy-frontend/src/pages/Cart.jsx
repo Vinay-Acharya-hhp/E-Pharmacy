@@ -179,6 +179,9 @@ export default function Cart() {
             <span>Total</span>
             <span className="cart__total">₹{total.toFixed(2)}</span>
           </div>
+          <Link to="/checkout" className="btn btn-primary btn-block cart__checkout">
+            Proceed to checkout
+          </Link>
         </>
       )}
     </div>

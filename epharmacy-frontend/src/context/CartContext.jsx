@@ -5,7 +5,7 @@ import { useAuth } from "./AuthContext";
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, customerId } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -18,14 +18,16 @@ export function CartProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await cartApi.get("/cart/getcart");
+      const res = await cartApi.get("/cart/getcart", {
+        headers: { id: customerId },
+      });
       setItems(res.data?.data || []);
     } catch (err) {
       setError(extractErrorMessage(err, "Could not load your cart"));
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, customerId]);
 
   async function addToCart(medicineId, quantity = 1) {
     await cartApi.post(`/cart/addcart/${medicineId}`, { quantity });
@@ -43,7 +45,9 @@ export function CartProvider({ children }) {
   }
 
   async function clearCart() {
-    await cartApi.delete("/cart/deleteallcart");
+    await cartApi.delete("/cart/deleteallcart", {
+      headers: { id: customerId },
+    });
     await refresh();
   }
 

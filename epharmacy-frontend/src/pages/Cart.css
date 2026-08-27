@@ -131,3 +131,7 @@
   font-weight: 700;
   color: var(--pine);
 }
+
+.cart__checkout {
+  margin-top: 18px;
+}

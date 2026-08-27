@@ -35,10 +35,17 @@ public class PaymentController {
 	
 	
 @PostMapping("/amount/{amountTopay}")
-public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(@PathVariable Double amountTopay,
+public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
+		@RequestHeader("Authorization") String authorization,
+		@PathVariable Double amountTopay,
 		@RequestBody PaymentRequestDto paymentRequestDto) {
-	
-		PaymentResponseDto data=service.makePayment(amountTopay, paymentRequestDto);
+	String token = authorization.trim();
+	if (token.startsWith("Bearer ")) {
+		token = token.substring(7).trim();
+	}
+	Long customerId = jwtService.extractCustomerId(token);
+
+		PaymentResponseDto data=service.makePayment(customerId, amountTopay, paymentRequestDto);
 		
 		ApiResponse<PaymentResponseDto> response=new ApiResponse<>(data,true,201);
 		return new ResponseEntity<>(response,HttpStatus.CREATED);

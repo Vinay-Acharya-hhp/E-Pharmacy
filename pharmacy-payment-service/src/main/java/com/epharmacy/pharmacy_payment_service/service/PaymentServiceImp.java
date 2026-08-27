@@ -21,6 +21,7 @@ import com.epharmacy.pharmacy_payment_service.entity.PaymentStatus;
 import com.epharmacy.pharmacy_payment_service.exception.CardNotFoundException;
 import com.epharmacy.pharmacy_payment_service.feignClient.OrderFeignClient;
 import com.epharmacy.pharmacy_payment_service.repo.Cardrepo;
+import com.epharmacy.pharmacy_payment_service.repo.PaymentRepo;
 
 
 import jakarta.transaction.Transactional;
@@ -28,14 +29,14 @@ import jakarta.transaction.Transactional;
 @Service
 public class PaymentServiceImp implements PaymentService {
 	
-	//private final PaymentRepo repo;
+	private final PaymentRepo paymentRepo;
 	private final ModelMapper modelmapper;
 	private final OrderFeignClient orderFeignClient;
 	private final Cardrepo cardrepo;
 
-	public PaymentServiceImp(ModelMapper modelmapper
+	public PaymentServiceImp(PaymentRepo paymentRepo, ModelMapper modelmapper
 			,OrderFeignClient orderFeignClient,Cardrepo cardrepo) {
-		//this.repo = repo;
+		this.paymentRepo = paymentRepo;
 		this.modelmapper=modelmapper;
 		this.orderFeignClient=orderFeignClient;
 		this.cardrepo=cardrepo;
@@ -44,12 +45,13 @@ public class PaymentServiceImp implements PaymentService {
 	
 	
 	@Override
-	public PaymentResponseDto makePayment(Double amountTopay, PaymentRequestDto paymentRequestDto) {
+	@Transactional
+	public PaymentResponseDto makePayment(Long customerId, Double amountTopay, PaymentRequestDto paymentRequestDto) {
 		 // 1. Find card belonging to customer
         Card card = cardrepo
                 .findByCardIdAndCustomerId(
                 		paymentRequestDto.getCardId(),
-                		paymentRequestDto.getCustomerId())
+                		customerId)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "Invalid cardId or customerId"));
@@ -71,7 +73,27 @@ public class PaymentServiceImp implements PaymentService {
                     "Invalid payment amount");
         }
 
-        // 5. Payment successful
+        // 5. Save the payment record
+        Payment payment = new Payment();
+        payment.setCardNumber(card.getCardId());
+        payment.setOrderId(paymentRequestDto.getOrderId());
+        payment.setCustomerId(customerId);
+        payment.setAmount(amountTopay);
+        payment.setCvv(paymentRequestDto.getCvv());
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setCreatedAt(LocalDateTime.now());
+
+        Payment savedPayment = paymentRepo.save(payment);
+
+        // 6. Tell order-service so it can confirm the order,
+        //    reduce stock, and clear the customer's cart
+        if (paymentRequestDto.getOrderId() != null) {
+            orderFeignClient.paymentSuccess(
+                    paymentRequestDto.getOrderId(),
+                    savedPayment.getPaymentId()
+            );
+        }
+
         String transactionId =
                 "TXN-" + UUID.randomUUID();
 
