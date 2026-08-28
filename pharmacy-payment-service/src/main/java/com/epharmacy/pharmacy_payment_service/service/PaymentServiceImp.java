@@ -23,6 +23,8 @@ import com.epharmacy.pharmacy_payment_service.entity.OrderStatus;
 import com.epharmacy.pharmacy_payment_service.entity.Payment;
 import com.epharmacy.pharmacy_payment_service.entity.PaymentStatus;
 import com.epharmacy.pharmacy_payment_service.exception.CardNotFoundException;
+import com.epharmacy.pharmacy_payment_service.exception.InvalidAmountException;
+import com.epharmacy.pharmacy_payment_service.exception.OrderNotFoundException;
 import com.epharmacy.pharmacy_payment_service.feignClient.OrderFeignClient;
 import com.epharmacy.pharmacy_payment_service.repo.Cardrepo;
 import com.epharmacy.pharmacy_payment_service.repo.PaymentRepo;
@@ -54,7 +56,7 @@ public class PaymentServiceImp implements PaymentService {
 	public PaymentResponseDto payForOrder(Long customerId, PayOrderRequestDto payOrderRequestDto) {
 
 		if (payOrderRequestDto == null || payOrderRequestDto.getOrderId() == null) {
-			throw new IllegalArgumentException("orderId is required");
+			throw new OrderNotFoundException("orderId is required");
 		}
 
 		// 1. Look up the order and derive the amount to charge from it.
@@ -65,11 +67,11 @@ public class PaymentServiceImp implements PaymentService {
 						.getData();
           
 		if (orderInfo == null) {
-			throw new IllegalArgumentException("Order not found");
+			throw new OrderNotFoundException("Order not found");
 		}
 
 		if (!customerId.equals(orderInfo.getCustomerId())) {
-			throw new IllegalArgumentException("Order does not belong to this customer");
+			throw new OrderNotFoundException("Order does not belong to this customer");
 		}
 
 		if (orderInfo.getOrderStatus() != OrderStatus.PROCESSING) {
@@ -78,7 +80,7 @@ public class PaymentServiceImp implements PaymentService {
 
 		Double amountTopay = orderInfo.getAmount();
 		if (amountTopay == null || amountTopay <= 0) {
-			throw new IllegalArgumentException("Order has an invalid amount");
+			throw new InvalidAmountException("Order has an invalid amount");
 		}
 
 		// 2. Find the card belonging to this customer
@@ -87,21 +89,21 @@ public class PaymentServiceImp implements PaymentService {
 						payOrderRequestDto.getCardId(),
 						customerId)
 				.orElseThrow(() ->
-						new IllegalArgumentException("Invalid cardId or customerId"));
+						new CardNotFoundException("Invalid cardId or customerId"));
 
 		// 3. Validate CVV
 		if (!card.getCvv().equals(payOrderRequestDto.getCvv())) {
-			throw new IllegalArgumentException("Invalid CVV");
+			throw new CardNotFoundException("Invalid CVV");
 		}
 
 		// 4. Validate expiry date
 		if (card.getExpiryDate().isBefore(LocalDate.now())) {
-			throw new IllegalArgumentException("Card has expired");
+			throw new CardNotFoundException("Card has expired");
 		}
 //
 		// 5. Validate balance is sufficient
 		if (card.getBalance() == null || card.getBalance() < amountTopay) {
-			throw new IllegalArgumentException("Insufficient card balance");
+			throw new InvalidAmountException("Insufficient card balance");
 		}
 
 		// 6. Debit the card and persist the new balance

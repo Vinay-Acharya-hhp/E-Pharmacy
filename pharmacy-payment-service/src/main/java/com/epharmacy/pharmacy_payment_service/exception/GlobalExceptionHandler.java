@@ -25,4 +25,45 @@ public class GlobalExceptionHandler {
 				);
 		return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
 	}
+	
+	
+
+	@ExceptionHandler(InvalidAmountException.class)
+	public ResponseEntity<ApiResponse<?>> handleInvalidAmountException(InvalidAmountException e)
+	{
+		
+		ApiResponse<?> response=new ApiResponse<>(
+				
+				e.getMessage(),
+				false,
+				HttpStatus.PAYMENT_REQUIRED.value()
+				);
+		return new ResponseEntity<>(response,HttpStatus.PAYMENT_REQUIRED);
+	}
+	
+	@ExceptionHandler(NullValueException.class)
+	public ResponseEntity<ApiResponse<?>> handleNullValueException(NullValueException e)
+	{
+		
+		ApiResponse<?> response=new ApiResponse<>(
+				
+				e.getMessage(),
+				false,
+				HttpStatus.BAD_REQUEST.value()
+				);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(OrderNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleOrderNotFoundException(OrderNotFoundException e)
+	{
+		
+		ApiResponse<?> response=new ApiResponse<>(
+				
+				e.getMessage(),
+				false,
+				HttpStatus.NOT_FOUND.value()
+				);
+		return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+	}
 }
