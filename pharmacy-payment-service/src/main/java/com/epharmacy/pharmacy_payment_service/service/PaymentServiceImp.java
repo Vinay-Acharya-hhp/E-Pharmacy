@@ -2,6 +2,7 @@ package com.epharmacy.pharmacy_payment_service.service;
 
 import java.time.LocalDate;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.epharmacy.pharmacy_payment_service.apiresponse.ApiResponse;
 import com.epharmacy.pharmacy_payment_service.dto.requestdto.CardPaymentRequestDto;
+import com.epharmacy.pharmacy_payment_service.dto.requestdto.PayOrderRequestDto;
 import com.epharmacy.pharmacy_payment_service.dto.requestdto.PaymentRequestDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.CardResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.OrderPaymentResponseDto;
@@ -45,111 +47,245 @@ public class PaymentServiceImp implements PaymentService {
 	}
 	
 	
-	
+
+
 	@Override
 	@Transactional
-	public PaymentResponseDto makePayment(Long customerId, Double amountTopay, PaymentRequestDto paymentRequestDto) {
-		 // 1. Find card belonging to customer
-        Card card = cardrepo
-                .findByCardIdAndCustomerId(
-                		paymentRequestDto.getCardId(),
-                		customerId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Invalid cardId or customerId"));
+	public PaymentResponseDto payForOrder(Long customerId, PayOrderRequestDto payOrderRequestDto) {
 
-        // 2. Validate CVV
-        if (!card.getCvv().equals(paymentRequestDto.getCvv())) {
-            throw new IllegalArgumentException("Invalid CVV");
-        }
+		if (payOrderRequestDto == null || payOrderRequestDto.getOrderId() == null) {
+			throw new IllegalArgumentException("orderId is required");
+		}
 
-        // 3. Validate expiry date
-        if (card.getExpiryDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException(
-                    "Card has expired");
-        }
-        if(card.getBalance()<=0 || card.getBalance()<amountTopay) {
-        	throw new IllegalArgumentException("Invalid Blance amount");
-        }
+		// 1. Look up the order and derive the amount to charge from it.
+		//    The client never supplies the amount for this endpoint.
+		OrderPaymentResponseDto orderInfo =
+				orderFeignClient
+						.getidamount(payOrderRequestDto.getOrderId())
+						.getData();
+          
+		if (orderInfo == null) {
+			throw new IllegalArgumentException("Order not found");
+		}
 
-        // 4. Validate amount
-        if (amountTopay == null || amountTopay <= 0) {
-            throw new IllegalArgumentException(
-                    "Invalid payment amount");
-        }
+		if (!customerId.equals(orderInfo.getCustomerId())) {
+			throw new IllegalArgumentException("Order does not belong to this customer");
+		}
 
-        // 4b. Validate amount against the real order total
-        //     (never trust the client-supplied amount alone)
-        if (paymentRequestDto.getOrderId() != null) {
-            OrderPaymentResponseDto orderInfo =
-                    orderFeignClient
-                            .getidamount(paymentRequestDto.getOrderId())
-                            .getData();
+		if (orderInfo.getOrderStatus() != OrderStatus.PROCESSING) {
+			throw new IllegalArgumentException("Order is not waiting for payment");
+		}
 
-            if (orderInfo == null) {
-                throw new IllegalArgumentException(
-                        "Order not found");
-            }
+		Double amountTopay = orderInfo.getAmount();
+		if (amountTopay == null || amountTopay <= 0) {
+			throw new IllegalArgumentException("Order has an invalid amount");
+		}
 
-            if (!customerId.equals(orderInfo.getCustomerId())) {
-                throw new IllegalArgumentException(
-                        "Order does not belong to this customer");
-            }
+		// 2. Find the card belonging to this customer
+		Card card = cardrepo
+				.findByCardIdAndCustomerId(
+						payOrderRequestDto.getCardId(),
+						customerId)
+				.orElseThrow(() ->
+						new IllegalArgumentException("Invalid cardId or customerId"));
 
-            if (orderInfo.getOrderStatus() != OrderStatus.PROCESSING) {
-                throw new IllegalArgumentException(
-                        "Order is not waiting for payment");
-            }
+		// 3. Validate CVV
+		if (!card.getCvv().equals(payOrderRequestDto.getCvv())) {
+			throw new IllegalArgumentException("Invalid CVV");
+		}
 
-            if (Math.abs(orderInfo.getAmount() - amountTopay) > 0.01) {
-                throw new IllegalArgumentException(
-                        "Payment amount does not match order total");
-            }
-        }
+		// 4. Validate expiry date
+		if (card.getExpiryDate().isBefore(LocalDate.now())) {
+			throw new IllegalArgumentException("Card has expired");
+		}
+//
+		// 5. Validate balance is sufficient
+		if (card.getBalance() == null || card.getBalance() < amountTopay) {
+			throw new IllegalArgumentException("Insufficient card balance");
+		}
 
-        // 5. Save the payment record
-        Payment payment = new Payment();
-        payment.setCardNumber(card.getCardId());
-        payment.setOrderId(paymentRequestDto.getOrderId());
-        payment.setCustomerId(customerId);
-        payment.setAmount(amountTopay);
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setCreatedAt(LocalDateTime.now());
+		// 6. Debit the card and persist the new balance
+		card.setBalance(card.getBalance() - amountTopay);
+		cardrepo.save(card);
 
-        Payment savedPayment = paymentRepo.save(payment);
-
-        // 6. Tell order-service so it can confirm the order,
-        //    reduce stock, and clear the customer's cart
-        if (paymentRequestDto.getOrderId() != null) {
-            orderFeignClient.paymentSuccess(
-                    paymentRequestDto.getOrderId(),
-                    savedPayment.getPaymentId()
-            );
-        }
+		// 7. Save the payment record
+		String transactionId = "TXN-" + UUID.randomUUID();
         
+		Payment payment = new Payment();
+		payment.setPaymentId(transactionId);
+		payment.setCardNumber(card.getCardId());
+		payment.setOrderId(payOrderRequestDto.getOrderId());
+		payment.setCustomerId(customerId);
+		payment.setAmount(amountTopay);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setCreatedAt(LocalDateTime.now());
 
-        String transactionId =
-                "TXN-" + UUID.randomUUID();
+	    Payment pay=paymentRepo.save(payment);
 
-        return new PaymentResponseDto(
-                true,
-                "Payment made successfully",
-                savedPayment.getCustomerId(),
-                transactionId);
-    }
+//		// 8. Tell order-service so it can confirm the order,
+//		//    reduce stock, and clear the customer's cart
+//		orderFeignClient.paymentSuccess(
+//				payOrderRequestDto.getOrderId(),
+//				pay.getPaymentId()
+//		);
+
+		return new PaymentResponseDto(
+				true,
+				"Payment made successfully",
+				card.getCustomerId(),
+				pay.getPaymentId());
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@Override
+	public CardResponseDto addCard(Long customerId, CardPaymentRequestDto cardPaymentRequestDto) {
+		if(customerId==null) {
+			throw new CardNotFoundException("Customer Not found");
+		}
+		if(cardrepo.existsById(cardPaymentRequestDto.getCardId())) {
+			throw new CardNotFoundException("Card Already Exists");
+		}
+		
+		//card.setCardType(cardPaymentRequestDto.getCardType());
+		Card card= new Card();
+        card.setCardId(cardPaymentRequestDto.getCardId());
+        card.setCvv(cardPaymentRequestDto.getCvv());
+        card.setCardType(cardPaymentRequestDto.getCardType());
+	   card.setNameOnCard(cardPaymentRequestDto.getNameOnCard());
+	   card.setExpiryDate(cardPaymentRequestDto.getExpiryDate());
+	    card.setBalance(cardPaymentRequestDto.getBalance());
+		card.setCustomerId(customerId);
+		Card save=cardrepo.save(card);
+		return modelmapper.map(save, CardResponseDto.class);
+	}
+
+	@Override
+	public List<CardResponseDto> viewCards(Long customerId) {
+		if(customerId==null) {
+			throw new CardNotFoundException("Customer Not found");
+		}
+		List<Card> cards=cardrepo.findByCustomerId(customerId);
+		if(cards.isEmpty()) {
+			throw new CardNotFoundException("Card Not found");
+		}
+		
+		return cards.stream().map(card ->modelmapper
+				.map(card,CardResponseDto.class ))
+				.toList();
+	}
+
+
+	}
+
+
+
+
+
+
+//@Override
+//@Transactional
+//public PaymentResponseDto makePayment(Long customerId, Double amountTopay, PaymentRequestDto paymentRequestDto) {
+//	 // 1. Find card belonging to customer
+//    Card card = cardrepo
+//            .findByCardIdAndCustomerId(
+//            		paymentRequestDto.getCardId(),
+//            		customerId)
+//            .orElseThrow(() ->
+//                    new IllegalArgumentException(
+//                            "Invalid cardId or customerId"));
+//
+//    // 2. Validate CVV
+//    if (!card.getCvv().equals(paymentRequestDto.getCvv())) {
+//        throw new IllegalArgumentException("Invalid CVV");
+//    }
+//
+//    // 3. Validate expiry date
+//    if (card.getExpiryDate().isBefore(LocalDate.now())) {
+//        throw new IllegalArgumentException(
+//                "Card has expired");
+//    }
+//    if(card.getBalance()<=0 || card.getBalance()<amountTopay) {
+//    	throw new IllegalArgumentException("Invalid Blance amount");
+//    }
+//
+//    // 4. Validate amount
+//    if (amountTopay == null || amountTopay <= 0) {
+//        throw new IllegalArgumentException(
+//                "Invalid payment amount");
+//    }
+//
+//    // 4b. Validate amount against the real order total
+//    //     (never trust the client-supplied amount alone)
+//    if (paymentRequestDto.getOrderId() != null) {
+//        OrderPaymentResponseDto orderInfo =
+//                orderFeignClient
+//                        .getidamount(paymentRequestDto.getOrderId())
+//                        .getData();
+//
+//        if (orderInfo == null) {
+//            throw new IllegalArgumentException(
+//                    "Order not found");
+//        }
+//
+//        if (!customerId.equals(orderInfo.getCustomerId())) {
+//            throw new IllegalArgumentException(
+//                    "Order does not belong to this customer");
+//        }
+//
+//        if (orderInfo.getOrderStatus() != OrderStatus.PROCESSING) {
+//            throw new IllegalArgumentException(
+//                    "Order is not waiting for payment");
+//        }
+//
+//        if (Math.abs(orderInfo.getAmount() - amountTopay) > 0.01) {
+//            throw new IllegalArgumentException(
+//                    "Payment amount does not match order total");
+//        }
+//    }
+//
+//    // 5. Save the payment record
+//    Payment payment = new Payment();
+//    payment.setCardNumber(card.getCardId());
+//    payment.setOrderId(paymentRequestDto.getOrderId());
+//    payment.setCustomerId(customerId);
+//    payment.setAmount(amountTopay);
+//    payment.setStatus(PaymentStatus.SUCCESS);
+//    payment.setCreatedAt(LocalDateTime.now());
+//
+//    Payment savedPayment = paymentRepo.save(payment);
+//
+//    // 6. Tell order-service so it can confirm the order,
+//    //    reduce stock, and clear the customer's cart
+//    if (paymentRequestDto.getOrderId() != null) {
+//        orderFeignClient.paymentSuccess(
+//                paymentRequestDto.getOrderId(),
+//                savedPayment.getPaymentId()
+//        );
+//    }
+//    
+//
+//    String transactionId =
+//            "TXN-" + UUID.randomUUID();
+//
+//    return new PaymentResponseDto(
+//            true,
+//            "Payment made successfully",
+//            savedPayment.getCustomerId(),
+//            transactionId);
+//}
 //
 //@Override
 //@Transactional
@@ -195,7 +331,7 @@ public class PaymentServiceImp implements PaymentService {
 //	        String cardNumber =
 //	                request.getCardNumber();
 //
-//            payment.setCardNumber(cardNumber);
+//          payment.setCardNumber(cardNumber);
 //	        payment.setExpiryMonth(
 //	                request.getExpiryMonth()
 //	        );
@@ -277,44 +413,3 @@ public class PaymentServiceImp implements PaymentService {
 //		return "Payment of Rs." +amountToPay +" successful";
 //	}
 
-
-	
-	@Override
-	public CardResponseDto addCard(Long customerId, CardPaymentRequestDto cardPaymentRequestDto) {
-		if(customerId==null) {
-			throw new CardNotFoundException("Customer Not found");
-		}
-		if(cardrepo.existsById(cardPaymentRequestDto.getCardId())) {
-			throw new CardNotFoundException("Card Already Exists");
-		}
-		
-		//card.setCardType(cardPaymentRequestDto.getCardType());
-		Card card= new Card();
-        card.setCardId(cardPaymentRequestDto.getCardId());
-        card.setCvv(cardPaymentRequestDto.getCvv());
-        card.setCardType(cardPaymentRequestDto.getCardType());
-	   card.setNameOnCard(cardPaymentRequestDto.getNameOnCard());
-	   card.setExpiryDate(cardPaymentRequestDto.getExpiryDate());
-	    card.setBalance(cardPaymentRequestDto.getBalance());
-		card.setCustomerId(customerId);
-		Card save=cardrepo.save(card);
-		return modelmapper.map(save, CardResponseDto.class);
-	}
-
-	@Override
-	public List<CardResponseDto> viewCards(Long customerId) {
-		if(customerId==null) {
-			throw new CardNotFoundException("Customer Not found");
-		}
-		List<Card> cards=cardrepo.findByCustomerId(customerId);
-		if(cards.isEmpty()) {
-			throw new CardNotFoundException("Card Not found");
-		}
-		
-		return cards.stream().map(card ->modelmapper
-				.map(card,CardResponseDto.class ))
-				.toList();
-	}
-
-
-	}

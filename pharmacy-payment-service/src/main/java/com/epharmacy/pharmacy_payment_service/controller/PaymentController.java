@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.epharmacy.pharmacy_payment_service.apiresponse.ApiResponse;
 import com.epharmacy.pharmacy_payment_service.configuration.JWTService;
 import com.epharmacy.pharmacy_payment_service.dto.requestdto.CardPaymentRequestDto;
+import com.epharmacy.pharmacy_payment_service.dto.requestdto.PayOrderRequestDto;
 import com.epharmacy.pharmacy_payment_service.dto.requestdto.PaymentRequestDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.CardResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.PaymentResponseDto;
@@ -33,23 +34,39 @@ public class PaymentController {
 		this.jwtService=jwtService;
 	}
 	
-	
-@PostMapping("/amount/{amountTopay}")
-public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
+//	
+//@PostMapping("/amount/{amountTopay}")
+//public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
+//		@RequestHeader("Authorization") String authorization,
+//		@PathVariable Double amountTopay,
+//		@RequestBody PaymentRequestDto paymentRequestDto) {
+//	String token = authorization.trim();
+//	if (token.startsWith("Bearer ")) {
+//		token = token.substring(7).trim();
+//	}
+//	Long customerId = jwtService.extractCustomerId(token);
+//System.out.println(customerId);
+//		PaymentResponseDto data=service.makePayment(customerId, amountTopay, paymentRequestDto);
+//		
+//		ApiResponse<PaymentResponseDto> response=new ApiResponse<>(data,true,201);
+//		return new ResponseEntity<>(response,HttpStatus.CREATED);
+//		
+//}
+
+@PostMapping("/pay")
+public ResponseEntity<ApiResponse<PaymentResponseDto>> payForOrder(
 		@RequestHeader("Authorization") String authorization,
-		@PathVariable Double amountTopay,
-		@RequestBody PaymentRequestDto paymentRequestDto) {
+		@RequestBody PayOrderRequestDto payOrderRequestDto) {
 	String token = authorization.trim();
 	if (token.startsWith("Bearer ")) {
 		token = token.substring(7).trim();
 	}
 	Long customerId = jwtService.extractCustomerId(token);
-System.out.println(customerId);
-		PaymentResponseDto data=service.makePayment(customerId, amountTopay, paymentRequestDto);
-		
-		ApiResponse<PaymentResponseDto> response=new ApiResponse<>(data,true,201);
-		return new ResponseEntity<>(response,HttpStatus.CREATED);
-		
+
+	PaymentResponseDto data = service.payForOrder(customerId, payOrderRequestDto);
+
+	ApiResponse<PaymentResponseDto> response = new ApiResponse<>(data, true, 201);
+	return new ResponseEntity<>(response, HttpStatus.CREATED);
 }
 	
 	
@@ -80,6 +97,7 @@ System.out.println(customerId);
 	@PostMapping("/card/addcard")
 	public ResponseEntity<ApiResponse<CardResponseDto>> addCard
 	(@RequestHeader("Authorization") String authorization,@RequestBody CardPaymentRequestDto cardRequestDto) {
+		System.out.println("printing till here");
 		String token =authorization.trim();
 		if(token.startsWith("Bearer ")) {
 	    	token=token.substring(7).trim();

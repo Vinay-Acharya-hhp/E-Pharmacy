@@ -20,8 +20,7 @@ import lombok.NoArgsConstructor;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private String paymentId;
     private String cardNumber;
     private Long orderId;
 

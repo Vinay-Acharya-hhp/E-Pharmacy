@@ -488,10 +488,12 @@ public class OrderServiceImp implements OrderService{
 
 	@Override
 	public OrderPaymentResponseDto getidamount(Long orderId) {
-		Order order =orderrepo.findById(orderId).orElseThrow();
+		Order order =orderrepo.findById(orderId).orElseThrow(()-> new IllegalStateException
+				("Only orders in PROCESSING status can be cancelled"));
 		OrderPaymentResponseDto response=new OrderPaymentResponseDto();
 		response.setAmount(order.getFinalAmount());
 		response.setOrderId(order.getOrderId());
+		response.setCustomerId(order.getCustomerId());
 		response.setOrderStatus(order.getOrderStatus());
 		return response;
 	}

@@ -72,7 +72,14 @@ public class OrderContoller {
 		return new ResponseEntity<>(response,HttpStatus.OK);
 	}
 	@GetMapping("/getorderid/{orderId}")
-	public ResponseEntity<ApiResponse<OrderPaymentResponseDto>> getidamount(@PathVariable Long orderId) {
+	public ResponseEntity<ApiResponse<OrderPaymentResponseDto>> getidamount(@PathVariable Long orderId
+			 ) {
+//		System.out.println(orderId);
+//		String token =authorization.trim();
+//		if(token.startsWith("Bearer ")) {
+//			token=token.substring(7).trim();
+//		}
+//		Long customerId=jwtService.extractCustomerId(token);
 		OrderPaymentResponseDto data=service.getidamount(orderId);
 		 ApiResponse<OrderPaymentResponseDto> response=new ApiResponse<>(data,true,200);
 			return new ResponseEntity<>(response,HttpStatus.OK);
