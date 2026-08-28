@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class PaymentResponseDto {
 private boolean success;
 private String message;
+private Long customerId;
 private String transactionId;
 
 }

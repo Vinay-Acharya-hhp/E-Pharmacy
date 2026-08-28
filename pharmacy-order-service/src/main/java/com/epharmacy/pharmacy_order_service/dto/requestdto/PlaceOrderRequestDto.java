@@ -20,10 +20,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PlaceOrderRequestDto {
 	
-	 private Double orderValueBeforeDiscount;
-	 private CustomerRequestDto customer;
+	 
 	 private AddressRequestDto deliveryAddress;
-	 private CardPaymentRequestDto card;
+	
 	
 
 }

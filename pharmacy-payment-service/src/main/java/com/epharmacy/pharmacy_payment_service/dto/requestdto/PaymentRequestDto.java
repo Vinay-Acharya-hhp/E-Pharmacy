@@ -21,7 +21,6 @@ public class PaymentRequestDto {
 	    private CardType cardType;
 	    private String cvv;
 	    private LocalDate expiryMonth;
-	    private Long customerId;
 	    private Long orderId;
 
 	  

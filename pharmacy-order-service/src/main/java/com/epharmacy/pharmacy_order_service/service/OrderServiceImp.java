@@ -60,7 +60,14 @@ public class OrderServiceImp implements OrderService{
 		        Long customerId,
 		        PlaceOrderRequestDto placeorderRequestdto) {
 
-		   
+		    if (placeorderRequestdto == null
+		            || placeorderRequestdto.getDeliveryAddress() == null
+		            || placeorderRequestdto.getDeliveryAddress().getAddressId() == null) {
+
+		        throw new IllegalArgumentException(
+		                "Delivery address is required to place an order"
+		        );
+		    }
 
 		    ApiResponse<AddressDTO> addressResponse;
 
@@ -68,15 +75,33 @@ public class OrderServiceImp implements OrderService{
 
 		        addressResponse =
 		                customerAddressFeignClient.getaddress(
-		                        placeorderRequestdto.getDeliveryAddress().getAddressId(),
-		                        customerId
+		                        placeorderRequestdto.getDeliveryAddress().getAddressId()
 		                );
 
-		    } catch (FeignException e) {
+		    } catch (FeignException.NotFound e) {
 
 		        throw new AddressNotFoundException(
 		                "Address not found for customer "
 		                        + customerId
+		        );
+
+		    } catch (FeignException.Unauthorized | FeignException.Forbidden e) {
+
+		        throw new IllegalStateException(
+		                "Could not verify the delivery address because the request "
+		                        + "was not authorized by the user service. "
+		                        + "This usually means the Authorization token was not "
+		                        + "propagated correctly between services."
+		        );
+
+		    } catch (FeignException e) {
+
+		        throw new IllegalStateException(
+		                "Could not verify the delivery address — "
+		                        + "user service returned status "
+		                        + e.status()
+		                        + ": "
+		                        + e.getMessage()
 		        );
 		    }
 
@@ -103,7 +128,8 @@ public class OrderServiceImp implements OrderService{
 		    try {
 
 		        cartResponse =
-		                cartItemFeignClient.getCartMedicine();
+		                cartItemFeignClient
+		                        .getCartMedicine();
 
 		    } catch (FeignException e) {
 
@@ -132,6 +158,15 @@ public class OrderServiceImp implements OrderService{
 
 
 		    for (CartResponseDto cartItem : cartItems) {
+
+		        if (cartItem.getQuantity() == null
+		                || cartItem.getQuantity() <= 0) {
+
+		            throw new IllegalStateException(
+		                    "Invalid quantity for medicine "
+		                            + cartItem.getMedicineId()
+		            );
+		        }
 
 		        Long medicineId =
 		                cartItem.getMedicineId();
@@ -167,16 +202,6 @@ public class OrderServiceImp implements OrderService{
 		        MedicineResponseDTO medicine =
 		                medicineResponse.getData();
 
-		        if (medicine.getQuantity() == null
-		                || medicine.getQuantity() < cartItem.getQuantity()) {
-
-		            throw new IllegalStateException(
-		                    "Insufficient stock for "
-		                            + medicine.getMedicineName()
-		                            + ". Available quantity: "
-		                            + (medicine.getQuantity() == null ? 0 : medicine.getQuantity())
-		            );
-		        }
 
 		      
 		        OrderItem orderItem =
@@ -273,6 +298,10 @@ public class OrderServiceImp implements OrderService{
 
 		    response.setAddressId(
 		            savedOrder.getAddressId()
+		    );
+
+		    response.setOrderValueBeforeDiscount(
+		            total
 		    );
 
 		    response.setDiscount(
@@ -435,9 +464,9 @@ public class OrderServiceImp implements OrderService{
 
 	    // 7. Get order items
 
-	    List<OrderItem> orderItems = orderItemrepo
-                .findByOrder_OrderId(orderId);
-	            
+	    List<OrderItem> orderItems =
+	            orderItemrepo
+	                    .findByOrder_OrderId(orderId);
 
 
 	    // 8. Reduce medicine quantity
@@ -463,7 +492,6 @@ public class OrderServiceImp implements OrderService{
 		OrderPaymentResponseDto response=new OrderPaymentResponseDto();
 		response.setAmount(order.getFinalAmount());
 		response.setOrderId(order.getOrderId());
-		response.setCustomerId(order.getCustomerId());
 		response.setOrderStatus(order.getOrderStatus());
 		return response;
 	}

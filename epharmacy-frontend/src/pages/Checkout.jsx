@@ -58,7 +58,8 @@ export default function Checkout() {
       const res = await customerApi.get("/customer/view-address");
       const list = res.data?.data || [];
       setAddresses(list);
-      if (list.length > 0) setSelectedAddressId(list[0].id);
+      const firstAddressId = list[0]?.id ?? list[0]?.addressId;
+      if (firstAddressId) setSelectedAddressId(Number(firstAddressId));
     } catch {
       setAddresses([]);
     }
@@ -109,7 +110,7 @@ export default function Checkout() {
 
   async function handlePlaceOrder() {
     if (!selectedAddressId) {
-      setError("Add or select a delivery address first.");
+      setError("Add or select a saved delivery address first. If you just updated the backend, restart user-service so address IDs are returned.");
       return;
     }
     setError(null);
@@ -193,12 +194,13 @@ export default function Checkout() {
             {addresses.length > 0 && (
               <div className="option-list">
                 {addresses.map((a) => (
-                  <label key={a.id} className="option-row">
+                  <label key={a.id ?? a.addressId ?? a.addressName} className="option-row">
                     <input
                       type="radio"
                       name="address"
-                      checked={selectedAddressId === a.id}
-                      onChange={() => setSelectedAddressId(a.id)}
+                      checked={selectedAddressId === Number(a.id ?? a.addressId)}
+                      onChange={() => setSelectedAddressId(Number(a.id ?? a.addressId))}
+                      disabled={!a.id && !a.addressId}
                     />
                     <span>
                       <strong>{a.addressName}</strong> — {a.addressLine1}, {a.city},{" "}

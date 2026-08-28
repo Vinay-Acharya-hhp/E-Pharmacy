@@ -21,8 +21,9 @@ public class Card {
 	private String cardId;
 	private String nameOnCard;
 	@Enumerated(EnumType.STRING)
-	private CardType cartType;
+	private CardType cardType;
 	private String cvv;
+	private Double balance;
 	private LocalDate expiryDate;
 	private Long customerId;
 

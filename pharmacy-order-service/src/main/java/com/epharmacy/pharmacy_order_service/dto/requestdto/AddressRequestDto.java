@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class AddressRequestDto {
-private Long AddressId;
+private Long addressId;
 }

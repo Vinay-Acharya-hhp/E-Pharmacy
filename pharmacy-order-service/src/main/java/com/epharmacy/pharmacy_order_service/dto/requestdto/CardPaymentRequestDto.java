@@ -17,5 +17,5 @@ private String nameOncard;
 private CardType cardType;
 private String cvv;
 private LocalDate expirydate;
-private Long customerId;
+
 }

@@ -16,6 +16,7 @@ import com.epharmacy.pharmacy_payment_service.dto.responsedto.CardResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.OrderPaymentResponseDto;
 import com.epharmacy.pharmacy_payment_service.dto.responsedto.PaymentResponseDto;
 import com.epharmacy.pharmacy_payment_service.entity.Card;
+import com.epharmacy.pharmacy_payment_service.entity.CardType;
 import com.epharmacy.pharmacy_payment_service.entity.OrderStatus;
 import com.epharmacy.pharmacy_payment_service.entity.Payment;
 import com.epharmacy.pharmacy_payment_service.entity.PaymentStatus;
@@ -66,6 +67,9 @@ public class PaymentServiceImp implements PaymentService {
         if (card.getExpiryDate().isBefore(LocalDate.now())) {
             throw new IllegalArgumentException(
                     "Card has expired");
+        }
+        if(card.getBalance()<=0 || card.getBalance()<amountTopay) {
+        	throw new IllegalArgumentException("Invalid Blance amount");
         }
 
         // 4. Validate amount
@@ -122,6 +126,7 @@ public class PaymentServiceImp implements PaymentService {
                     savedPayment.getPaymentId()
             );
         }
+        
 
         String transactionId =
                 "TXN-" + UUID.randomUUID();
@@ -129,6 +134,7 @@ public class PaymentServiceImp implements PaymentService {
         return new PaymentResponseDto(
                 true,
                 "Payment made successfully",
+                savedPayment.getCustomerId(),
                 transactionId);
     }
 
@@ -281,7 +287,15 @@ public class PaymentServiceImp implements PaymentService {
 		if(cardrepo.existsById(cardPaymentRequestDto.getCardId())) {
 			throw new CardNotFoundException("Card Already Exists");
 		}
-		Card card= modelmapper.map(cardPaymentRequestDto, Card.class);
+		
+		//card.setCardType(cardPaymentRequestDto.getCardType());
+		Card card= new Card();
+        card.setCardId(cardPaymentRequestDto.getCardId());
+        card.setCvv(cardPaymentRequestDto.getCvv());
+        card.setCardType(cardPaymentRequestDto.getCardType());
+	   card.setNameOnCard(cardPaymentRequestDto.getNameOnCard());
+	   card.setExpiryDate(cardPaymentRequestDto.getExpiryDate());
+	    card.setBalance(cardPaymentRequestDto.getBalance());
 		card.setCustomerId(customerId);
 		Card save=cardrepo.save(card);
 		return modelmapper.map(save, CardResponseDto.class);

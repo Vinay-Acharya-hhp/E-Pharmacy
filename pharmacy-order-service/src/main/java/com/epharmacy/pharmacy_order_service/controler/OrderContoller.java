@@ -31,7 +31,7 @@ public class OrderContoller {
 	@Autowired
 	private JWTService jwtService;
 	
-	@PostMapping("/place-order")
+	@PostMapping({"/place-order", "/placeorder"})
 	public ResponseEntity<ApiResponse<OrderResponseDto>> placeorder
 	(@RequestHeader("Authorization")String authorization,
 			@RequestBody PlaceOrderRequestDto placeorderRequestdto

@@ -13,6 +13,5 @@ import com.epharmacy.pharmacy_order_service.dto.responsedto.AddressDTO;
 @FeignClient(name="PHARMACY-USER-SERVICE")
 public interface CustomerAddressFeignClient {
 	@GetMapping("customer/getaddress/{addressId}")
-  ApiResponse< AddressDTO> getaddress(@PathVariable Long addressId,
-			@RequestHeader("id")Long customerId);
+  ApiResponse< AddressDTO> getaddress(@PathVariable Long addressId);
 }

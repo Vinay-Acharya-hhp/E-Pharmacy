@@ -146,13 +146,13 @@ public class CustomerControler {
 	
 	@GetMapping("/getaddress/{addressId}")
 	public ResponseEntity<ApiResponse<AddressDTO>> getaddress(@PathVariable Long addressId,
-			@RequestHeader("id")Long customerId)
+			@RequestHeader("Authorization")String authorization)
 	{
-//		String token=authorization.trim();
-//		if(token.startsWith("Bearer ")) {
-//			token=token.substring(7).trim();
-//		}
-//		Long customerId=jwtService.extractId(token);
+		String token=authorization.trim();
+		if(token.startsWith("Bearer ")) {
+			token=token.substring(7).trim();
+		}
+		Long customerId=jwtService.extractId(token);
 		AddressDTO data =service.getaddress(addressId, customerId);
 		ApiResponse<AddressDTO> response= new ApiResponse<>(data,true,200);
 		return new ResponseEntity<>(response,HttpStatus.OK);

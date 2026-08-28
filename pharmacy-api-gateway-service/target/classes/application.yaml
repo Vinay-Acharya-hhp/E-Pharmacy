@@ -34,7 +34,7 @@ spring:
                 - Path=/order/**
 
             - id: payment-service
-              uri: lb://PHARMACY-PAYEMENT-SERVICE
+              uri: lb://PHARMACY-PAYMENT-SERVICE
               predicates:
                 - Path=/payment/**
 

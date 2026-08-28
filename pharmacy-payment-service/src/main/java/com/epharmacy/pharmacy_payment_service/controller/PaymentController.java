@@ -44,7 +44,7 @@ public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
 		token = token.substring(7).trim();
 	}
 	Long customerId = jwtService.extractCustomerId(token);
-
+System.out.println(customerId);
 		PaymentResponseDto data=service.makePayment(customerId, amountTopay, paymentRequestDto);
 		
 		ApiResponse<PaymentResponseDto> response=new ApiResponse<>(data,true,201);
@@ -77,7 +77,7 @@ public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
 //		return new ResponseEntity<>(response,HttpStatus.CREATED);
 //	}
 
-	@PostMapping("/addcard")
+	@PostMapping("/card/addcard")
 	public ResponseEntity<ApiResponse<CardResponseDto>> addCard
 	(@RequestHeader("Authorization") String authorization,@RequestBody CardPaymentRequestDto cardRequestDto) {
 		String token =authorization.trim();
@@ -85,6 +85,7 @@ public	ResponseEntity<ApiResponse<PaymentResponseDto>> makePayment(
 	    	token=token.substring(7).trim();
 	    	}
 	    	Long customerId=jwtService.extractCustomerId(token);
+	    	System.out.println(customerId);
 		CardResponseDto data=service.addCard(customerId, cardRequestDto);
 		ApiResponse<CardResponseDto> response=new ApiResponse<>(data,true,201);
 		return new ResponseEntity<>(response,HttpStatus.CREATED);

@@ -25,7 +25,7 @@ public class CorsConfig {
         );
 
         configuration.setAllowedHeaders(
-                List.of("Authorization", "Content-Type","id")
+                List.of("Authorization", "Content-Type")
         );
 
         configuration.setAllowCredentials(true);
