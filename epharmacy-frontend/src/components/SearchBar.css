@@ -1,0 +1,216 @@
+.searchbar {
+  position: relative;
+  max-width: 480px;
+}
+
+.searchbar__form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(247, 243, 234, 0.25);
+  background: rgba(247, 243, 234, 0.08);
+  border-radius: var(--radius);
+  padding: 0 6px 0 14px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.searchbar__form:focus-within {
+  border-color: var(--amber);
+  background: rgba(247, 243, 234, 0.12);
+}
+
+.searchbar__form .icon {
+  color: rgba(247, 243, 234, 0.6);
+  flex-shrink: 0;
+}
+
+.searchbar__form input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--parchment);
+  padding: 12px 4px;
+  font-size: 0.95rem;
+}
+
+.searchbar__form input::placeholder {
+  color: rgba(247, 243, 234, 0.55);
+}
+
+.searchbar__form input:focus {
+  outline: none;
+}
+
+.searchbar__form .btn {
+  margin: 5px;
+  flex-shrink: 0;
+}
+
+.searchbar__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(247, 243, 234, 0.14);
+  color: var(--parchment);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.searchbar__clear:hover {
+  background: rgba(247, 243, 234, 0.24);
+}
+
+.searchbar__spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(247, 243, 234, 0.25);
+  border-top-color: var(--amber);
+  animation: searchbar-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes searchbar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dropdown panel */
+.searchbar__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--line);
+  padding: 8px;
+  z-index: 60;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.searchbar__panel-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 6px 8px 4px;
+}
+
+.searchbar__empty {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  padding: 10px 8px;
+  margin: 0;
+}
+
+.searchbar__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--ink);
+  font: inherit;
+}
+
+.searchbar__row:hover,
+.searchbar__row.is-active {
+  background: var(--sage);
+}
+
+.searchbar__row--recent .icon {
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.searchbar__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.searchbar__row--recent .searchbar__row-text,
+.searchbar__row--all .searchbar__row-text {
+  flex-direction: row;
+  align-items: center;
+}
+
+.searchbar__row-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchbar__row-meta {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.searchbar__row-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--coral);
+  border: 1px solid var(--coral);
+  border-radius: 3px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.searchbar__thumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--sage);
+}
+
+.searchbar__row-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.searchbar__row-remove:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.searchbar__row--all {
+  color: var(--amber-dark);
+  font-weight: 500;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  border-radius: 0;
+}
+
+.searchbar__row--all .icon {
+  color: var(--amber-dark);
+}

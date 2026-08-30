@@ -14,6 +14,24 @@ export const PORTS = {
 
 const TOKEN_KEY = "epharmacy_token";
 
+// When the JWT is missing/expired, every protected endpoint (cart, order,
+// payment, profile, ...) comes back 401 from Spring Security's default
+// entry point. Catch that once, here, instead of in every page.
+function handleSessionExpired() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem("epharmacy_customer_id");
+  localStorage.removeItem("epharmacy_customer_name");
+
+  if (window.location.pathname !== "/login") {
+    // Full reload (not react-router navigate) so AuthContext/CartContext
+    // re-initialize from the now-empty localStorage instead of holding
+    // stale in-memory auth state.
+    window.location.href = `/login?sessionExpired=1&from=${encodeURIComponent(
+      window.location.pathname
+    )}`;
+  }
+}
+
 function makeClient(baseURL) {
   const instance = axios.create({ baseURL, headers: { "Content-Type": "application/json" } });
   instance.interceptors.request.use((config) => {
@@ -21,6 +39,20 @@ function makeClient(baseURL) {
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   });
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const status = error?.response?.status;
+      // 401 = no/expired/invalid token. Only treat 403 as expiry when we
+      // actually had a token (a plain "not permitted" 403 shouldn't log
+      // the user out).
+      const hadToken = Boolean(localStorage.getItem(TOKEN_KEY));
+      if (status === 401 || (status === 403 && hadToken)) {
+        handleSessionExpired();
+      }
+      return Promise.reject(error);
+    }
+  );
   return instance;
 }
 

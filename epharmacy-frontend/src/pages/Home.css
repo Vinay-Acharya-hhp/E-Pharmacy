@@ -3,10 +3,19 @@
   color: var(--parchment);
   padding: 56px 0 64px;
   position: relative;
-  overflow: hidden;
+  /* No overflow:hidden here — the search suggestions dropdown needs to
+     pop out below this section. The decorative ring is clipped by its
+     own wrapper (.hero__decor) instead. */
 }
 
-.hero::after {
+.hero__decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__decor::after {
   content: "";
   position: absolute;
   right: -60px;
@@ -45,42 +54,6 @@
   line-height: 1.5;
   margin: 0 0 28px;
   max-width: 520px;
-}
-
-.hero__search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 480px;
-  border: 1px solid rgba(247, 243, 234, 0.25);
-  background: rgba(247, 243, 234, 0.08);
-  border-radius: var(--radius);
-  padding: 0 6px 0 14px;
-}
-
-.hero__search .icon {
-  color: rgba(247, 243, 234, 0.6);
-}
-
-.hero__search input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  color: var(--parchment);
-  padding: 12px 4px;
-  font-size: 0.95rem;
-}
-
-.hero__search input::placeholder {
-  color: rgba(247, 243, 234, 0.55);
-}
-
-.hero__search input:focus {
-  outline: none;
-}
-
-.hero__search .btn {
-  margin: 5px;
 }
 
 .med-grid {

@@ -4,6 +4,7 @@ import MedicineCard from "../components/MedicineCard";
 import CategoryChips from "../components/CategoryChips";
 import Pagination from "../components/Pagination";
 import Icon from "../components/Icon";
+import SearchBar from "../components/SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import "./Home.css";
@@ -15,8 +16,8 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(0);
   const [category, setCategory] = useState("All");
-  const [query, setQuery] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchBarKey, setSearchBarKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addingId, setAddingId] = useState(null);
@@ -52,16 +53,16 @@ export default function Home() {
     load();
   }, [load]);
 
-  function handleSearchSubmit(e) {
-    e.preventDefault();
+  function handleSearch(term) {
     setPage(0);
-    setSearchTerm(query);
+    setSearchTerm(term);
+    if (term) setCategory("All");
   }
 
   function handleCategorySelect(cat) {
     setCategory(cat);
-    setQuery("");
     setSearchTerm("");
+    setSearchBarKey((k) => k + 1); // remount SearchBar to clear its input
     setPage(0);
   }
 
@@ -86,6 +87,7 @@ export default function Home() {
   return (
     <div className="home">
       <section className="hero">
+        <div className="hero__decor" />
         <div className="container hero__inner">
           <p className="hero__eyebrow">Dispensed with care since your last order</p>
           <h1 className="hero__title">Everything on the shelf, nothing on the counter.</h1>
@@ -93,18 +95,7 @@ export default function Home() {
             Search the full formulary, filter by category, and add straight to your cart —
             every listing carries a real label photo, not a placeholder.
           </p>
-          <form className="hero__search" onSubmit={handleSearchSubmit}>
-            <Icon name="search" size={17} />
-            <input
-              type="text"
-              placeholder="Search by medicine name…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <button type="submit" className="btn btn-amber">
-              Search
-            </button>
-          </form>
+          <SearchBar key={searchBarKey} onSearch={handleSearch} />
         </div>
       </section>
 

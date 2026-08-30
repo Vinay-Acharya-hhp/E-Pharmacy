@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { extractErrorMessage } from "../api/client";
 import "./Auth.css";
@@ -7,6 +7,9 @@ import "./Auth.css";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionExpired = searchParams.get("sessionExpired") === "1";
+  const redirectTo = searchParams.get("from") || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -18,7 +21,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate("/");
+      navigate(redirectTo);
     } catch (err) {
       setError(extractErrorMessage(err, "Invalid email or password."));
     } finally {
@@ -32,6 +35,9 @@ export default function Login() {
         <p className="auth__eyebrow">Welcome back</p>
         <h1 className="auth__title">Sign in to E-Pharmacy</h1>
 
+        {sessionExpired && !error && (
+          <div className="error-banner">Your session has expired. Please sign in again.</div>
+        )}
         {error && <div className="error-banner">{error}</div>}
 
         <form onSubmit={handleSubmit}>

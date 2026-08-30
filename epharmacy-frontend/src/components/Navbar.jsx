@@ -34,7 +34,7 @@ export default function Navbar() {
     <header className="nav">
       <div className="container nav__inner">
         <Link to="/" className="nav__brand" onClick={() => setMobileOpen(false)}>
-          <span className="nav__mark">Rx</span>
+          <img className="nav__mark" src="/rx.svg" alt="E-Pharmacy" width="32" height="32" />
           <span className="nav__word">E-Pharmacy</span>
         </Link>
 

@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="foot">
       <div className="container foot__inner">
         <div className="foot__brand">
-          <span className="nav__mark">Rx</span>
+          <span className="nav__mark"></span>
           <div>
             <p className="foot__word">E-Pharmacy</p>
             <p className="foot__tag">Dispensed with care, delivered with the receipt attached.</p>
@@ -38,7 +38,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="container foot__legal">
-        <span>© {new Date().getFullYear()} E-Pharmacy — a demo storefront for a Spring Boot microservices backend.</span>
+        <span>© {new Date().getFullYear()} E-Pharmacy —  Spring Boot microservices Application</span>
       </div>
     </footer>
   );

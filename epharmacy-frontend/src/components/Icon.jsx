@@ -22,6 +22,8 @@ const PATHS = {
   edit: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z",
   close: "M6 6l12 12M18 6 6 18",
   alert: "M12 9v4m0 4h.01M10.3 3.9 2.5 18a1.7 1.7 0 0 0 1.5 2.5h16a1.7 1.7 0 0 0 1.5-2.5L13.7 3.9a1.7 1.7 0 0 0-3.4 0Z",
+  clock: "M12 7v5l3.5 2M20.5 12a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0Z",
+  trending: "M3 17l6-6 4 4 8-8M15 6h6v6",
 };
 
 export default function Icon({ name, size = 18, strokeWidth = 1.75, className = "" }) {
