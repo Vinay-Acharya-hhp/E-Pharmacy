@@ -30,7 +30,7 @@ export default function Login() {
     <div className="auth">
       <div className="auth__card">
         <p className="auth__eyebrow">Welcome back</p>
-        <h1 className="auth__title">Sign in to MedRx</h1>
+        <h1 className="auth__title">Sign in to E-Pharmacy</h1>
 
         {error && <div className="error-banner">{error}</div>}
 

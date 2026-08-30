@@ -1,7 +1,6 @@
 import "./CategoryChips.css";
 
-const CATEGORIES = [
-  "All",
+export const CATEGORIES = [
   "Painkiller",
   "Antibiotic",
   "Vitamin",
@@ -11,12 +10,16 @@ const CATEGORIES = [
   "Skincare",
   "Cold & Flu",
   "Digestive",
+  "Ayurvedic",
+  "Homeopathy",
 ];
+
+const CHIP_OPTIONS = ["All", ...CATEGORIES];
 
 export default function CategoryChips({ active, onSelect }) {
   return (
     <div className="chips">
-      {CATEGORIES.map((cat) => (
+      {CHIP_OPTIONS.map((cat) => (
         <button
           key={cat}
           className={`chip ${active === cat ? "chip--active" : ""}`}

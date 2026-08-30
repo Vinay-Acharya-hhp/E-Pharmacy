@@ -1,0 +1,16 @@
+.admin {
+  max-width: 720px;
+}
+
+.admin__sub {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  background: var(--sage);
+  border: 1px solid var(--sage-dim);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 4px 0 28px;
+}

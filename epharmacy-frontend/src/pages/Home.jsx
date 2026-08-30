@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { medicineApi, extractErrorMessage } from "../api/client";
+import { endpoints, extractErrorMessage } from "../api/client";
 import MedicineCard from "../components/MedicineCard";
 import CategoryChips from "../components/CategoryChips";
 import Pagination from "../components/Pagination";
+import Icon from "../components/Icon";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import "./Home.css";
@@ -30,19 +31,11 @@ export default function Home() {
     try {
       let res;
       if (searchTerm.trim()) {
-        res = await medicineApi.get(
-          `/medicine/serach/${encodeURIComponent(searchTerm.trim())}/${page}`,
-          { params: { size: PAGE_SIZE } }
-        );
+        res = await endpoints.medicine.search(searchTerm.trim(), page, PAGE_SIZE);
       } else if (category !== "All") {
-        res = await medicineApi.get(
-          `/medicine/get-category/${encodeURIComponent(category)}/${page}`,
-          { params: { size: PAGE_SIZE } }
-        );
+        res = await endpoints.medicine.getByCategory(category, page, PAGE_SIZE);
       } else {
-        res = await medicineApi.get(`/medicine/get-all/${page}`, {
-          params: { size: PAGE_SIZE },
-        });
+        res = await endpoints.medicine.getAll(page, PAGE_SIZE);
       }
       const pageData = res.data?.data;
       setMedicines(pageData?.content || []);
@@ -98,9 +91,10 @@ export default function Home() {
           <h1 className="hero__title">Everything on the shelf, nothing on the counter.</h1>
           <p className="hero__sub">
             Search the full formulary, filter by category, and add straight to your cart —
-            every listing carries its own label photo.
+            every listing carries a real label photo, not a placeholder.
           </p>
           <form className="hero__search" onSubmit={handleSearchSubmit}>
+            <Icon name="search" size={17} />
             <input
               type="text"
               placeholder="Search by medicine name…"
@@ -120,9 +114,20 @@ export default function Home() {
         {error && <div className="error-banner">{error}</div>}
 
         {loading ? (
-          <div className="home__loading">Reading the shelf labels…</div>
+          <div className="med-grid">
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <div className="med-card-skel" key={i}>
+                <div className="skeleton med-card-skel__photo" />
+                <div className="skeleton" style={{ height: 12, width: "60%", margin: "14px 0 8px" }} />
+                <div className="skeleton" style={{ height: 16, width: "85%" }} />
+              </div>
+            ))}
+          </div>
         ) : medicines.length === 0 ? (
-          <div className="home__empty">
+          <div className="empty-state">
+            <div className="icon-badge">
+              <Icon name="search" />
+            </div>
             <h3>No medicines found</h3>
             <p>Try a different search term or category.</p>
           </div>

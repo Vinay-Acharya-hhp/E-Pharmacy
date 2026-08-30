@@ -1,0 +1,42 @@
+.addresses__row {
+  flex-wrap: wrap;
+}
+
+.addresses__detail {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+  width: 100%;
+  flex-basis: 100%;
+}
+
+.addresses__facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 24px;
+  margin: 0;
+}
+
+.addresses__facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.addresses__facts dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.addresses__facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .addresses__facts {
+    grid-template-columns: 1fr;
+  }
+}

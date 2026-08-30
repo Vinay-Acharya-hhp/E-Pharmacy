@@ -394,6 +394,8 @@ public class OrderServiceImp implements OrderService{
 	
 	@Override
 	public List<OrderResponseDto> getCustomerorders(Long customerId) {
+		modelmapper.typeMap(Order.class, OrderResponseDto.class)
+		.addMappings(m -> m.map(Order::getFinalAmount, OrderResponseDto::setAmountPaid));
 		List<Order> list=orderrepo.findByCustomerId(customerId);
 		return list.stream().map(orderlist ->modelmapper.map(orderlist,OrderResponseDto.class )).toList();
 	}

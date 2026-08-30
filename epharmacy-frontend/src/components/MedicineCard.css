@@ -7,6 +7,13 @@
   flex-direction: column;
   box-shadow: var(--shadow-card);
   position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.med-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(15, 61, 62, 0.1), 0 14px 28px rgba(15, 61, 62, 0.12);
 }
 
 .med-card__photo {
@@ -42,6 +49,13 @@
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 999px;
+}
+
+.med-card__badge--out {
+  top: auto;
+  bottom: 10px;
+  right: 10px;
+  background: var(--ink);
 }
 
 /* Perforated tear line — the label signature */
@@ -90,6 +104,9 @@
 }
 
 .med-card__expiry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--coral);

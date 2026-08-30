@@ -1,0 +1,79 @@
+.foot {
+  background: var(--pine-dark);
+  color: var(--sage-dim);
+  margin-top: 64px;
+}
+
+.foot__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  justify-content: space-between;
+  padding: 48px 28px 32px;
+}
+
+.foot__brand {
+  display: flex;
+  gap: 12px;
+  max-width: 280px;
+}
+
+.foot__word {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--parchment);
+  margin: 2px 0 4px;
+}
+
+.foot__tag {
+  font-size: 0.84rem;
+  color: var(--sage-dim);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.foot__cols {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.foot__col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 150px;
+}
+
+.foot__col h4 {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 4px;
+}
+
+.foot__col a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sage-dim);
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.foot__col a:hover {
+  color: #fff;
+}
+
+.foot__note {
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.foot__legal {
+  border-top: 1px solid rgba(247, 243, 234, 0.12);
+  padding: 16px 28px 24px;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}

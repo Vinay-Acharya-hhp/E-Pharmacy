@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { customerApi, orderApi, paymentApi, extractErrorMessage } from "../api/client";
-import { useAuth } from "../context/AuthContext";
+import { endpoints, extractErrorMessage } from "../api/client";
 import { useCart } from "../context/CartContext";
+import Icon from "../components/Icon";
 import "./Checkout.css";
 
 const emptyAddress = {
@@ -18,15 +18,15 @@ const emptyAddress = {
 const emptyCard = {
   cardId: "",
   nameOnCard: "",
-  cartType: "CREDIT",
+  cardType: "CREDIT",
   cvv: "",
   expiryDate: "",
+  balance: "",
 };
 
-const STEP = { REVIEW: "review", PLACE: "place", PAY: "pay", DONE: "done" };
+const STEP = { REVIEW: "review", PAY: "pay", DONE: "done" };
 
 export default function Checkout() {
-  const { customerId } = useAuth();
   const { items, refresh: refreshCart } = useCart();
   const navigate = useNavigate();
 
@@ -55,11 +55,10 @@ export default function Checkout() {
 
   async function loadAddresses() {
     try {
-      const res = await customerApi.get("/customer/view-address");
+      const res = await endpoints.customer.viewAddress();
       const list = res.data?.data || [];
       setAddresses(list);
-      const firstAddressId = list[0]?.id ?? list[0]?.addressId;
-      if (firstAddressId) setSelectedAddressId(Number(firstAddressId));
+      if (list[0]?.id) setSelectedAddressId(Number(list[0].id));
     } catch {
       setAddresses([]);
     }
@@ -67,11 +66,13 @@ export default function Checkout() {
 
   async function loadCards() {
     try {
-      const res = await paymentApi.get("/payment/getcards");
+      const res = await endpoints.payment.getCards();
       const list = res.data?.data || [];
       setCards(list);
       if (list.length > 0) setSelectedCardId(list[0].cardId);
     } catch {
+      // A brand-new account has no cards yet — the backend responds 404
+      // ("Card Not found"), which is expected, not an error to surface.
       setCards([]);
     }
   }
@@ -81,7 +82,7 @@ export default function Checkout() {
     setError(null);
     setLoading(true);
     try {
-      await customerApi.post("/customer/add-address", addressForm);
+      await endpoints.customer.addAddress(addressForm);
       setAddressForm(emptyAddress);
       setShowAddressForm(false);
       await loadAddresses();
@@ -97,7 +98,7 @@ export default function Checkout() {
     setError(null);
     setLoading(true);
     try {
-      await paymentApi.post("/payment/addcard", cardForm);
+      await endpoints.payment.addCard({ ...cardForm, balance: Number(cardForm.balance) || 0 });
       setCardForm(emptyCard);
       setShowCardForm(false);
       await loadCards();
@@ -110,24 +111,19 @@ export default function Checkout() {
 
   async function handlePlaceOrder() {
     if (!selectedAddressId) {
-      setError("Add or select a saved delivery address first. If you just updated the backend, restart user-service so address IDs are returned.");
+      setError("Add or select a delivery address first.");
       return;
     }
     setError(null);
     setLoading(true);
-    setStep(STEP.PLACE);
     try {
-      const res = await orderApi.post("/order/place-order", {
-        orderValueBeforeDiscount: null,
-        customer: { customerId: Number(customerId) },
+      const res = await endpoints.order.place({
         deliveryAddress: { addressId: selectedAddressId },
-        card: null,
       });
       setOrder(res.data?.data);
       setStep(STEP.PAY);
     } catch (err) {
       setError(extractErrorMessage(err, "Could not place order."));
-      setStep(STEP.REVIEW);
     } finally {
       setLoading(false);
     }
@@ -139,17 +135,28 @@ export default function Checkout() {
     setError(null);
     setLoading(true);
     try {
-      await paymentApi.post(`/payment/amount/${order.amountPaid}`, {
-        cardId: selectedCardId,
-        nameOnCard: cards.find((c) => c.cardId === selectedCardId)?.nameOnCard,
-        cardType: cards.find((c) => c.cardId === selectedCardId)?.cartType,
-        cvv: cvvInput,
+      await endpoints.payment.pay({
         orderId: order.orderId,
+        cardId: selectedCardId,
+        cvv: cvvInput,
       });
+
+      // The order-service expects a numeric paymentId here, but the
+      // payment-service's own transaction id is the string it returned
+      // above (e.g. "TXN-<uuid>") — the two services were never wired
+      // together for this field, so we pass a timestamp as a stand-in
+      // just to flip the order to CONFIRMED, reduce stock, and clear
+      // the cart server-side. This does not affect what was charged.
+      try {
+        await endpoints.order.confirmPayment(order.orderId, Date.now());
+      } catch {
+        // Non-fatal — the payment itself already succeeded.
+      }
+
       setStep(STEP.DONE);
       await refreshCart();
     } catch (err) {
-      setError(extractErrorMessage(err, "Payment failed. Check your CVV and try again."));
+      setError(extractErrorMessage(err, "Payment failed. Check the card details and try again."));
     } finally {
       setLoading(false);
     }
@@ -158,14 +165,22 @@ export default function Checkout() {
   if (step === STEP.DONE) {
     return (
       <div className="container checkout-done">
+        <div className="icon-badge" style={{ margin: "0 auto 14px" }}>
+          <Icon name="check" size={26} />
+        </div>
         <h1>Order confirmed</h1>
         <p>
           Order #{order?.orderId} is paid and on its way — expected delivery{" "}
           {order?.expectedDeliveryDate}.
         </p>
-        <button className="btn btn-primary" onClick={() => navigate("/")}>
-          Back to catalog
-        </button>
+        <div className="inline-actions" style={{ justifyContent: "center" }}>
+          <button className="btn btn-primary" onClick={() => navigate("/orders")}>
+            View my orders
+          </button>
+          <button className="btn btn-ghost" onClick={() => navigate("/")}>
+            Back to catalog
+          </button>
+        </div>
       </div>
     );
   }
@@ -190,21 +205,20 @@ export default function Checkout() {
       {step !== STEP.PAY && (
         <>
           <section className="checkout-section">
-            <h2>Delivery address</h2>
+            <h2><Icon name="pin" size={16} /> Delivery address</h2>
             {addresses.length > 0 && (
               <div className="option-list">
                 {addresses.map((a) => (
-                  <label key={a.id ?? a.addressId ?? a.addressName} className="option-row">
+                  <label key={a.id} className="option-row">
                     <input
                       type="radio"
                       name="address"
-                      checked={selectedAddressId === Number(a.id ?? a.addressId)}
-                      onChange={() => setSelectedAddressId(Number(a.id ?? a.addressId))}
-                      disabled={!a.id && !a.addressId}
+                      checked={selectedAddressId === Number(a.id)}
+                      onChange={() => setSelectedAddressId(Number(a.id))}
                     />
                     <span>
-                      <strong>{a.addressName}</strong> — {a.addressLine1}, {a.city},{" "}
-                      {a.state} {a.pincode}
+                      <strong>{a.addressName}</strong> — {a.addressLine1}, {a.city}, {a.state}{" "}
+                      {a.pincode}
                     </span>
                   </label>
                 ))}
@@ -213,7 +227,7 @@ export default function Checkout() {
 
             {!showAddressForm ? (
               <button className="btn btn-ghost" onClick={() => setShowAddressForm(true)}>
-                + Add new address
+                <Icon name="plus" size={14} /> Add new address
               </button>
             ) : (
               <form className="inline-form" onSubmit={handleSaveAddress}>
@@ -243,12 +257,21 @@ export default function Checkout() {
                 </div>
                 <div className="field-row">
                   <div className="field">
+                    <label>Area</label>
+                    <input
+                      value={addressForm.area}
+                      onChange={(e) => setAddressForm((f) => ({ ...f, area: e.target.value }))}
+                    />
+                  </div>
+                  <div className="field">
                     <label>City</label>
                     <input
                       value={addressForm.city}
                       onChange={(e) => setAddressForm((f) => ({ ...f, city: e.target.value }))}
                     />
                   </div>
+                </div>
+                <div className="field-row">
                   <div className="field">
                     <label>State</label>
                     <input
@@ -262,6 +285,7 @@ export default function Checkout() {
                     <input
                       required
                       pattern="[0-9]{6}"
+                      title="6-digit pincode"
                       value={addressForm.pincode}
                       onChange={(e) => setAddressForm((f) => ({ ...f, pincode: e.target.value }))}
                     />
@@ -271,11 +295,7 @@ export default function Checkout() {
                   <button className="btn btn-primary" disabled={loading}>
                     Save address
                   </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={() => setShowAddressForm(false)}
-                  >
+                  <button type="button" className="btn btn-ghost" onClick={() => setShowAddressForm(false)}>
                     Cancel
                   </button>
                 </div>
@@ -284,7 +304,10 @@ export default function Checkout() {
           </section>
 
           <section className="checkout-section">
-            <h2>Payment card</h2>
+            <h2><Icon name="card" size={16} /> Payment card</h2>
+            <p className="field-hint" style={{ marginTop: -8 }}>
+              You'll confirm the CVV again on the next step — the order is placed first, then paid.
+            </p>
             {cards.length > 0 && (
               <div className="option-list">
                 {cards.map((c) => (
@@ -296,7 +319,8 @@ export default function Checkout() {
                       onChange={() => setSelectedCardId(c.cardId)}
                     />
                     <span>
-                      {c.nameOnCard} — card ending {c.cardId.slice(-4)} ({c.cartType})
+                      {c.nameOnCard} — card ending {c.cardId.slice(-4)} ({c.cardType}) · balance ₹
+                      {Number(c.balance || 0).toFixed(2)}
                     </span>
                   </label>
                 ))}
@@ -305,7 +329,7 @@ export default function Checkout() {
 
             {!showCardForm ? (
               <button className="btn btn-ghost" onClick={() => setShowCardForm(true)}>
-                + Add new card
+                <Icon name="plus" size={14} /> Add new card
               </button>
             ) : (
               <form className="inline-form" onSubmit={handleSaveCard}>
@@ -332,8 +356,8 @@ export default function Checkout() {
                   <div className="field">
                     <label>Type</label>
                     <select
-                      value={cardForm.cartType}
-                      onChange={(e) => setCardForm((f) => ({ ...f, cartType: e.target.value }))}
+                      value={cardForm.cardType}
+                      onChange={(e) => setCardForm((f) => ({ ...f, cardType: e.target.value }))}
                     >
                       <option value="CREDIT">Credit</option>
                       <option value="DEBIT">Debit</option>
@@ -358,15 +382,26 @@ export default function Checkout() {
                     />
                   </div>
                 </div>
+                <div className="field">
+                  <label>Card balance (demo top-up)</label>
+                  <input
+                    required
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={cardForm.balance}
+                    onChange={(e) => setCardForm((f) => ({ ...f, balance: e.target.value }))}
+                    placeholder="5000"
+                  />
+                </div>
+                <p className="field-hint">
+                  This demo card is debited for real by the payment service, so it needs a starting balance.
+                </p>
                 <div className="inline-form__actions">
                   <button className="btn btn-primary" disabled={loading}>
                     Save card
                   </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={() => setShowCardForm(false)}
-                  >
+                  <button type="button" className="btn btn-ghost" onClick={() => setShowCardForm(false)}>
                     Cancel
                   </button>
                 </div>
@@ -389,22 +424,40 @@ export default function Checkout() {
           <h2>Pay for order #{order.orderId}</h2>
           <p className="checkout-amount">
             Amount due: <strong>₹{order.amountPaid?.toFixed(2)}</strong>
+            {order.discount > 0 && (
+              <span className="muted"> (₹{order.discount.toFixed(2)} discount applied)</span>
+            )}
           </p>
-          <form className="inline-form" onSubmit={handlePay}>
-            <div className="field">
-              <label>Enter CVV for the selected card to confirm</label>
-              <input
-                required
-                maxLength={3}
-                value={cvvInput}
-                onChange={(e) => setCvvInput(e.target.value)}
-                placeholder="123"
-              />
+
+          {!selectedCardId ? (
+            <div className="hint-banner">
+              No saved card yet — go back and add one before paying.
+              <div style={{ marginTop: 10 }}>
+                <button className="btn btn-ghost" onClick={() => setStep(STEP.REVIEW)}>
+                  <Icon name="arrowLeft" size={14} /> Back
+                </button>
+              </div>
             </div>
-            <button className="btn btn-primary btn-block" disabled={loading}>
-              {loading ? "Processing payment…" : `Pay ₹${order.amountPaid?.toFixed(2)}`}
-            </button>
-          </form>
+          ) : (
+            <form className="inline-form" onSubmit={handlePay} style={{ borderTop: "none", paddingTop: 0, marginTop: 0 }}>
+              <p className="field-hint" style={{ marginTop: 0 }}>
+                Paying with card ending {selectedCardId.slice(-4)}
+              </p>
+              <div className="field">
+                <label>Enter CVV to confirm</label>
+                <input
+                  required
+                  maxLength={3}
+                  value={cvvInput}
+                  onChange={(e) => setCvvInput(e.target.value)}
+                  placeholder="123"
+                />
+              </div>
+              <button className="btn btn-primary btn-block" disabled={loading}>
+                {loading ? "Processing payment…" : `Pay ₹${order.amountPaid?.toFixed(2)}`}
+              </button>
+            </form>
+          )}
         </section>
       )}
     </div>

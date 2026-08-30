@@ -91,6 +91,13 @@
   margin: 10px 0 22px;
 }
 
+.pay-now,
+.order-card .inline-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
 @media (max-width: 720px) {
   .orders__header,
   .order-card__top,

@@ -32,6 +32,31 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   padding: 22px;
+  margin-bottom: 20px;
+}
+
+.profile__quicklinks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.list-row--link {
+  text-decoration: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.list-row--link:hover {
+  border-color: var(--pine);
+}
+
+@media (max-width: 640px) {
+  .profile__quicklinks {
+    grid-template-columns: 1fr;
+  }
 }
 
 .profile-summary {

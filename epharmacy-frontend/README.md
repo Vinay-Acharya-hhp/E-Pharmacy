@@ -1,30 +1,86 @@
-# MedRx — E-Pharmacy Frontend
+# E-Pharmacy — Frontend
 
-A React (Vite) frontend for the [E-Pharmacy](https://github.com/Vinay-Acharya-hhp/E-Pharmacy) Spring Boot microservices backend.
+A React (Vite) storefront for the E-Pharmacy Spring Boot microservices backend
+(Eureka + gateway + user, medicine, cart, order and payment services).
 
-## What's included
+## Pages → endpoints
 
-- **Catalog** — browse, search, and filter medicines by category, with pagination
-- **Medicine photos** — each medicine card shows its `imageUrl` photo when the backend has one, and falls back to generated label art (colored monogram) when it doesn't
-- **Auth** — register / sign in against `pharmacy-user-service` (JWT stored client-side)
-- **Cart** — add, update quantity, remove, and clear items via `pharmacy-cart-service`
+Every REST endpoint exposed by the five services is wired into the UI somewhere.
+`src/api/client.js` keeps a single indexed map (`endpoints.*`) of all of them.
 
-## Backend change required
+| Page | Microservice | Endpoints used |
+|---|---|---|
+| Catalog (`/`) | medicine | `GET /medicine/get-all/{page}`, `GET /medicine/get-category/{category}/{page}`, `GET /medicine/serach/{name}/{page}` |
+| Medicine detail (`/medicine/:id`) | medicine, cart | `GET /medicine/getbyid/{id}`, `POST /cart/addcart/{id}` |
+| Cart (`/cart`) | cart, medicine | `GET /cart/getcart`, `PUT /cart/updatecart/{id}`, `DELETE /cart/deletecart/{id}`, `DELETE /cart/deleteallcart`, `GET /medicine/getbyid/{id}` |
+| Checkout (`/checkout`) | customer, payment, order | `GET/POST /customer/view-address` `/add-address`, `GET/POST /payment/getcards` `/card/addcard`, `POST /order/place-order`, `POST /payment/pay`, `PUT /order/{id}/payment-success` |
+| Orders (`/orders`) | order, payment | `GET /order/view-order/customer/{id}`, `GET /order/getorderid/{id}`, `PUT /order/cancel-order/{id}`, `POST /payment/pay`, `PUT /order/{id}/payment-success` |
+| Track order (`/track-order`) | order | `GET /order/getorderid/{id}` — public, no sign-in |
+| Profile (`/profile`) | customer | `GET /customer/profile`, `PUT /customer/update-profile`, `PUT /customer/change-password` |
+| Addresses (`/addresses`) | customer | `GET /customer/view-address`, `POST /customer/add-address`, `GET /customer/getaddress/{id}` |
+| Payment methods (`/cards`) | payment | `GET /payment/getcards`, `POST /payment/card/addcard` |
+| Pharmacist console (`/admin`) | medicine | `POST /medicine/add-medicine`, `PUT /medicine/update-stock/{id}` |
+| Register / Login | customer | `POST /customer/register`, `POST /customer/login` |
 
-The original `Medicine` entity/DTOs had no photo field. This project adds one:
+## Photos
 
-```java
-// Medicine.java, MedicineRequestDTO.java, MedicineResponseDTO.java
-private String imageUrl;
-```
+Medicine photos are real static files, not remote URLs or generated art:
 
-This has already been applied to the cloned backend copy used to build this frontend — apply the same one-line addition (plus a getter/setter, handled by Lombok) to your own copy of `pharmacy_medicine_service` if you haven't already. `ModelMapper` maps it automatically since the field name matches across entity/DTOs; no other backend code needs to change.
+- `public/images/catalog/` bundles the 9 usable images that shipped in
+  `pharmacy_medicine_service/src/main/resources/static/images/` (the other
+  4 files in that folder are mis-saved `.htm` pages, not images, so they're
+  skipped).
+- If a medicine's `imageUrl` is a full `http(s)` URL, it's used as-is.
+- If it's a relative path under `/images/catalog/...`, it's one of this
+  app's bundled photos.
+- Any other relative path (e.g. one pointing at the medicine service's own
+  `static/images` folder) is resolved against the medicine service's own
+  host, so real backend-hosted photos work too.
+- If a medicine has no photo at all, `src/utils/medicineImages.js` picks a
+  deterministic static photo by category (see `CATEGORY_IMAGE`) — never a
+  drawn/generated placeholder.
 
-When adding a medicine via `POST /medicine/add-medicine`, just include an `imageUrl` pointing at any publicly reachable image (a CDN link, an uploaded image host, etc.) — this project doesn't include file upload/storage, only display.
+The pharmacist console (`/admin`) lets you attach one of the bundled photos
+to a new listing from a dropdown, or leave it blank to fall back to the
+category default.
+
+## Bugs fixed vs. the original scaffold
+
+While wiring up every endpoint against the actual controller code, a few
+mismatches turned up between this frontend and the real backend:
+
+- **Payment.** The checkout flow called `POST /payment/amount/{amount}`,
+  which is commented out in `PaymentController.java`. It now calls the real
+  endpoint, `POST /payment/pay`, with `{ orderId, cardId, cvv }`.
+- **Card creation.** The card form sent `cartType`; the DTO field is
+  `cardType`. It also never sent `balance`, which the payment service
+  requires to actually debit the card. Both are fixed, and the form now
+  asks for a starting balance.
+- **Cancel order.** The cancel call sent `{ reason }`; `CancelOrderRequestDto`
+  expects `cancelReason`.
+
+## A known backend gap (documented, not silently patched)
+
+`PUT /order/{orderId}/payment-success` expects a numeric `paymentId`
+(it's stored on the `Order` entity as a `Long`), but
+`pharmacy-payment-service` generates a string transaction id
+(`"TXN-<uuid>"`) and the Feign call that was meant to forward it to the
+order service is commented out in `PaymentServiceImp.java`. So there's no
+real numeric id to send.
+
+This frontend calls `payment-success` right after a successful payment
+using a timestamp as a stand-in id, purely so the order flips to
+`CONFIRMED`, stock gets decremented, and the cart gets cleared
+server-side. The payment itself (card debit, payment record) already
+succeeded independently by that point — this call only affects order
+bookkeeping, not what was charged. If you want the two services properly
+linked, that's a one-line backend fix (uncomment the Feign call in
+`PaymentServiceImp.payForOrder` and have it pass a real numeric id).
 
 ## Running it
 
-1. Start the backend services (Eureka, gateway, and the five microservices) as usual, with a running MySQL instance.
+1. Start the backend: Eureka, the gateway, and all five services, with a
+   running MySQL instance.
 2. In this folder:
    ```bash
    npm install
@@ -32,9 +88,21 @@ When adding a medicine via `POST /medicine/add-medicine`, just include an `image
    ```
 3. Open http://localhost:5173
 
-The frontend calls each microservice **directly on its own port** (8081–8085), not through the gateway — this matches the CORS configuration already present in each service (`http://localhost:5173` is allow-listed per-service, but the gateway itself has no CORS config). If your ports differ, copy `.env.example` to `.env` and adjust the `VITE_*_URL` values.
+The frontend calls each microservice **directly on its own port**
+(8081–8085), not through the gateway — the gateway has no CORS
+configuration of its own, but every service individually allow-lists
+`http://localhost:5173`. If your ports differ, copy `.env.example` to
+`.env` and adjust the `VITE_*_URL` values.
 
 ## Notes on the backend as found
 
-- `GET /cart/getcart` and `DELETE /cart/deleteallcart` read the customer id from an `id` header rather than the JWT (the other cart endpoints use `Authorization`). The frontend decodes the JWT client-side and sends both an `Authorization` header and an `id` header on every request so all cart endpoints work.
-- Register expects `dateOfBirth` as `dd-MM-yyyy`; the frontend converts from the browser's native date input format automatically.
+- Register expects `dateOfBirth` as `dd-MM-yyyy`; the pharmacist console's
+  medicine dates use the same format. Both forms convert automatically from
+  the browser's native `yyyy-mm-dd` date input.
+- `/medicine/**`, `/order/getorderid/**`, `/customer/register`, and
+  `/customer/login` are the only routes that don't require a bearer token;
+  everything else does.
+- `PUT /medicine/update-stock/{id}` *decrements* stock by the amount you
+  send — it's the same call the order service makes internally once a
+  payment is confirmed. The pharmacist console exposes it for manual
+  corrections.
