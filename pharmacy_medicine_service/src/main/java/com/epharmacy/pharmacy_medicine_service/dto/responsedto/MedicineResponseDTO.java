@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class MedicineResponseDTO {
 	private Long id;
 	private String medicineName;
-	private String manufacturer;
+	private String manufacturer ;
 	private String category;
 	private LocalDate manufacturing_Date;
 	private LocalDate expirey_Date;

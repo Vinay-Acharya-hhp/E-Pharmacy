@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 public class MedicineRequestDTO {
-	private Long id;
 	private String medicineName;
 	private String manufacturer;
 	private String category;

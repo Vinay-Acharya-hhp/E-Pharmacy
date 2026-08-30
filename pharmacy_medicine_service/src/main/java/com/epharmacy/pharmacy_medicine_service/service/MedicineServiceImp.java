@@ -33,6 +33,7 @@ public class MedicineServiceImp implements MedicineService {
 	public MedicineResponseDTO addMedicine(MedicineRequestDTO medicineReq) {
 		
 		Medicine medicine=modelemapper.map(medicineReq, Medicine.class);
+		
 		Medicine save=repo.save(medicine);
 		
 		return modelemapper.map(save, MedicineResponseDTO.class);

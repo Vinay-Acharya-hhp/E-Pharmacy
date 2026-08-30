@@ -27,17 +27,18 @@ public class SecurityConfiguration {
 
 	                .cors(cors -> {})
 
-	                .authorizeHttpRequests(req -> req
+	                .authorizeHttpRequests(req -> req.anyRequest().permitAll())
 
 	                        // GET medicine is public
-	                        .requestMatchers(
-	                                HttpMethod.GET,
-	                                "/medicine/**"
-	                        ).permitAll()
+//	                        //.requestMatchers(
+//	                                HttpMethod.GET,
+//	                                HttpMethod.POST,
+//	                                "/medicine/**"
+	                      //  ).permitAll()
 
 	                        // Everything else requires authentication
-	                        .anyRequest().authenticated()
-	                )
+	                      //  .anyRequest().authenticated()
+	              //  )
 
 	                .sessionManagement(session ->
 	                        session.sessionCreationPolicy(

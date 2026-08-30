@@ -124,11 +124,11 @@ public class PaymentServiceImp implements PaymentService {
 
 	    Payment pay=paymentRepo.save(payment);
 
-//		// 8. Tell order-service so it can confirm the order,
-//		//    reduce stock, and clear the customer's cart
+		// 8. Tell order-service so it can confirm the order,
+		//    reduce stock, and clear the customer's cart
 //		orderFeignClient.paymentSuccess(
-//				payOrderRequestDto.getOrderId(),
-//				pay.getPaymentId()
+//				payOrderRequestDto.getOrderId(),	
+//		    pay.getPaymentId()
 //		);
 
 		return new PaymentResponseDto(
@@ -140,16 +140,6 @@ public class PaymentServiceImp implements PaymentService {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
 
 	
 	@Override
