@@ -37,6 +37,9 @@ spring:
               uri: lb://PHARMACY-PAYMENT-SERVICE
               predicates:
                 - Path=/payment/**
-
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
 server:
   port: 8080
