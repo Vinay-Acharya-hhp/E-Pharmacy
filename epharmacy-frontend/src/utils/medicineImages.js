@@ -16,6 +16,10 @@ export const STATIC_IMAGES = {
   tonic: `${CATALOG}/tonic.webp`,
   ors: `${CATALOG}/ors.webp`,
   general: `${CATALOG}/delo.webp`,
+  sunscreen:`${CATALOG}/sunscreen.webp`,
+  skincare:`${CATALOG}/skincare.webp`,
+  antyfungal:`${CATALOG}/antyfungal.webp`,
+  ashwagandha:`${CATALOG}/ashwagandha.webp`,
 };
 
 const ALL_STATIC = Object.values(STATIC_IMAGES);
@@ -29,7 +33,7 @@ const CATEGORY_IMAGE = {
   Antibiotic: STATIC_IMAGES.english,
   Cardiac: STATIC_IMAGES.english,
   Diabetes: STATIC_IMAGES.general,
-  Skincare: STATIC_IMAGES.ayurvedic,
+  Skincare: STATIC_IMAGES.antyfungal,
   Digestive: STATIC_IMAGES.amlaPowder,
   Ayurvedic: STATIC_IMAGES.ayurvedic,
   Homeopathy: STATIC_IMAGES.homeopathy,

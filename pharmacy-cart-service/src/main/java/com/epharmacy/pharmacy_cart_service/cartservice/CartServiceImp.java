@@ -3,6 +3,8 @@ package com.epharmacy.pharmacy_cart_service.cartservice;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +35,8 @@ public class CartServiceImp implements CartService {
         this.repo = repo;
         this.medicineFeignClient=medicineFeignClient;
     }
-
+    
+    @CacheEvict(value="cartbycustomerId",allEntries=true)
     @Override
     public CartResponseDto addMedicineToCart(
             Long medicineId,
@@ -47,7 +50,7 @@ public class CartServiceImp implements CartService {
         // Validate quantity
         if (addrequestdto.getQuantity() == null|| addrequestdto.getQuantity() <= 0) {
 
-            throw new IllegalArgumentException(      "Quantity must be greater than zero");
+            throw new IllegalArgumentException( "Quantity must be greater than zero");
         }
         
         ApiResponse<MedicineResponseDTO>getmedicineId;
@@ -87,7 +90,7 @@ public class CartServiceImp implements CartService {
         );
         
     }
-
+    @Cacheable(value="cartbycustomerId",key="#customerId") 
     @Override
     public List<CartResponseDto> getCartMedicine(Long customerId) {
 
@@ -95,10 +98,10 @@ public class CartServiceImp implements CartService {
 
         return cartList.stream()
                 .map(cart -> modelMapper.map(   cart,  CartResponseDto.class )) .toList();
-                      
-                         
+                                           
     }
 
+    @CacheEvict(value="cartbycustomerId",allEntries=true)
     @Override
     public CartResponseDto updateQuantity(
             Long medicineId,
@@ -152,7 +155,8 @@ public class CartServiceImp implements CartService {
                 CartResponseDto.class
         );
     }
-
+    
+    @CacheEvict(value="cartbycustomerId",allEntries=true)
     @Override
     public void deleteMedicine(
             Long medicineId,
@@ -181,6 +185,7 @@ public class CartServiceImp implements CartService {
         repo.delete(cart);
     }
 
+    @CacheEvict(value="cartbycustomerId",allEntries=true)
     @Transactional
     @Override
     public void deleteAllMedicine(Long customerId) {

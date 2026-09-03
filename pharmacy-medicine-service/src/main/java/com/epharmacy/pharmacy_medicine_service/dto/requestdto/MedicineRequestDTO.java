@@ -18,8 +18,8 @@ public class MedicineRequestDTO {
 	private LocalDate manufacturing_Date;
 	@JsonFormat(pattern= "dd-MM-yyyy")
 	private LocalDate expirey_Date;
-	private double price;
-	private int discountPercent;
+	private Double price;
+	private Integer discountPercent;
 	private Integer quantity;
 	private String imageUrl;
 }

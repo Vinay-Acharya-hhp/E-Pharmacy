@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.epharmacy.pharmacy_order_service.apiResponse.ApiResponse;
@@ -53,7 +55,7 @@ public class OrderServiceImp implements OrderService{
 	
 
 
-
+	  @CacheEvict(value="orderbycustomerId",allEntries=true)
 		@Override
 		@Transactional
 		public OrderResponseDto placeorder(
@@ -392,6 +394,7 @@ public class OrderServiceImp implements OrderService{
 	}
 	
 	
+	@Cacheable(value="orderbycustomerId",key="#customerId")    
 	@Override
 	public List<OrderResponseDto> getCustomerorders(Long customerId) {
 		modelmapper.typeMap(Order.class, OrderResponseDto.class)
@@ -414,7 +417,7 @@ public class OrderServiceImp implements OrderService{
 		
 		return modelmapper.map(cancelOrder, OrderResponseDto.class);
 	}
-
+	@CacheEvict(value="orderbycustomerId",allEntries=true)
 	@Override
 	public void paymentSuccess(Long orderId, Long paymentId) {
 
@@ -487,7 +490,8 @@ public class OrderServiceImp implements OrderService{
 	    cartItemFeignClient.deleteAllMedicine();
 		
 	}
-
+    
+	@CacheEvict(value="orderbycustomerId",allEntries=true)
 	@Override
 	public OrderPaymentResponseDto getidamount(Long orderId) {
 		Order order =orderrepo.findById(orderId).orElseThrow(()-> new IllegalStateException

@@ -12,31 +12,91 @@ spring:
       server:
         webmvc:
           routes:
-
+            - id: user-registration
+              uri: lb://PHARMACY-USER-SERVICE
+              predicates:
+                - Path=/customer/register
+                - Method=POST  
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@ipKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1 
+           
+            - id: user-login
+              uri: lb://PHARMACY-USER-SERVICE
+              predicates:
+                - Path=/customer/login
+                - Method=POST  
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@ipKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1 
+         
             - id: customer-service
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
                 - Path=/customer/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1     
 
             - id: medicine-service
               uri: lb://PHARMACY-MEDICINE-SERVICE
               predicates:
                 - Path=/medicine/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@ipKeyResolver}"
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    redis-rate-limiter.requestesTokens: 1     
 
             - id: cart-service
               uri: lb://PHARMACY-CART-SERVICE
               predicates:
                 - Path=/cart/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1     
 
             - id: order-service
               uri: lb://PHARMACY-ORDER-SERVICE
               predicates:
                 - Path=/order/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1     
 
             - id: payment-service
               uri: lb://PHARMACY-PAYMENT-SERVICE
               predicates:
                 - Path=/payment/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    key-resolver: "#{@userKeyResolver}"
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 5
+                    redis-rate-limiter.requestesTokens: 1     
 eureka:
   client:
     service-url:

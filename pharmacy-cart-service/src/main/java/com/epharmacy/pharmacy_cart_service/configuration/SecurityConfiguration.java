@@ -30,11 +30,11 @@ public class SecurityConfiguration {
 
 	                .authorizeHttpRequests(req -> req
 
-	                        // GET medicine is public
-//	                        .requestMatchers(
-//	                               
-//	                                "/cart/**"
-//	                        ).permitAll()
+	                       //  GET medicine is public
+	                       // .requestMatchers(
+	                               
+                            //    "/cart/**"
+	                       // ).permitAll()
 
 	                        // Everything else requires authentication
 	                        .anyRequest().authenticated()

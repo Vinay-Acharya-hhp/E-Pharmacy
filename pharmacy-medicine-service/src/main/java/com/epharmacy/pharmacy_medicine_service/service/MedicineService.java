@@ -6,16 +6,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.epharmacy.pharmacy_medicine_service.dto.requestdto.MedicineRequestDTO;
+import com.epharmacy.pharmacy_medicine_service.dto.responsedto.MedicinePageResponseDTO;
 import com.epharmacy.pharmacy_medicine_service.dto.responsedto.MedicineResponseDTO;
 
 public interface MedicineService {
 	
 	MedicineResponseDTO addMedicine(MedicineRequestDTO medicineReq);
-	Page <MedicineResponseDTO> getAll(int number,int size);
+	MedicinePageResponseDTO getAll(int number,int size);
 	
-	Page <MedicineResponseDTO> getAllbycatogary(String catogery,int number,int size);
+	MedicinePageResponseDTO getAllbycatogary(String catogery,int number,int size);
 	MedicineResponseDTO getById(Long id);
     void updateStock(Long medicineId , Integer quantity);
-    Page <MedicineResponseDTO> serach(String medicineName,int number,int size);
+    MedicinePageResponseDTO search(String medicineName,int number,int size);
     
 }
