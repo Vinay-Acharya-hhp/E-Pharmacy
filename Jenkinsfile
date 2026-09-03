@@ -39,11 +39,12 @@ pipeline {
                     mvn clean test
                     cd ..
 
-                    cd pharmacy-user-service
+                    cd pharmacy-medicine-service
                     mvn clean test
                     cd ..
-
-                    cd pharmacy-medicine-service
+              
+                  
+                    cd pharmacy-user-service
                     mvn clean test
                     cd ..
 
