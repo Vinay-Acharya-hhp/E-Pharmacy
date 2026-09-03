@@ -30,39 +30,58 @@ pipeline {
             }
         }
 
+        stage('Make Maven Wrapper Executable') {
+            steps {
+                sh '''
+                    chmod +x pharmacy-eureka-server/mvnw
+                    chmod +x pharmacy-user-service/mvnw
+                    chmod +x pharmacy-medicine-service/mvnw
+                    chmod +x pharmacy-cart-service/mvnw
+                    chmod +x pharmacy-order-service/mvnw
+                    chmod +x pharmacy-payment-service/mvnw
+                    chmod +x pharmacy-api-gateway-service/mvnw
+                '''
+            }
+        }
+
         stage('Test Microservices') {
             steps {
                 sh '''
                     set -e
-                    
-                    
+
+                    echo "Testing Eureka..."
                     cd pharmacy-eureka-server
-                    mvn clean test -DskipTests
+                    ./mvnw clean test
                     cd ..
 
-                    cd pharmacy-medicine-service
-                    mvn clean test
-                    cd ..
-              
-                  
+                    echo "Testing User Service..."
                     cd pharmacy-user-service
-                    mvn clean test
+                    ./mvnw clean test
                     cd ..
 
+                    echo "Testing Medicine Service..."
+                    cd pharmacy-medicine-service
+                    ./mvnw clean test
+                    cd ..
+
+                    echo "Testing Cart Service..."
                     cd pharmacy-cart-service
-                    mvn clean test
+                    ./mvnw clean test
                     cd ..
 
+                    echo "Testing Order Service..."
                     cd pharmacy-order-service
-                    mvn clean test
+                    ./mvnw clean test
                     cd ..
 
+                    echo "Testing Payment Service..."
                     cd pharmacy-payment-service
-                    mvn clean test
+                    ./mvnw clean test
                     cd ..
 
+                    echo "Testing API Gateway..."
                     cd pharmacy-api-gateway-service
-                    mvn clean test
+                    ./mvnw clean test
                     cd ..
                 '''
             }
@@ -78,8 +97,8 @@ pipeline {
                 ]) {
                     sh '''
                         echo "$DOCKERHUB_TOKEN" | docker login \
-                        -u "$DOCKERHUB_USERNAME" \
-                        --password-stdin
+                            -u "$DOCKERHUB_USERNAME" \
+                            --password-stdin
                     '''
                 }
             }
@@ -103,16 +122,23 @@ pipeline {
     }
 
     post {
+
         always {
             sh 'docker logout || true'
         }
 
         success {
-            echo 'All images successfully pushed to Docker Hub!'
+            echo '======================================'
+            echo ' Jenkins Pipeline Successful!'
+            echo ' Docker images pushed successfully.'
+            echo '======================================'
         }
 
         failure {
-            echo 'Pipeline failed.'
+            echo '======================================'
+            echo ' Jenkins Pipeline Failed!'
+            echo ' Check the stage logs above.'
+            echo '======================================'
         }
     }
 }
