@@ -2,7 +2,7 @@ spring:
   application:
     name: pharmacy-cart-service
   datasource:
-    url: jdbc:mysql://mysql:3306/cart_db
+    url: jdbc:mysql://cart-db:3306/cart_db
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver	

@@ -3,7 +3,7 @@ spring:
     name: pharmacy-medicine-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/medicine_db
+    url: jdbc:mysql://medicine-db:3306/medicine_db
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

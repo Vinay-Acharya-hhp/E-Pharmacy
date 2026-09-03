@@ -2,7 +2,7 @@ spring:
   application:
     name: pharmacy-payment-service
   datasource:
-    url: jdbc:mysql://mysql:3306/payment_db
+    url: jdbc:mysql://payment-db:3306/payment_db
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver	
