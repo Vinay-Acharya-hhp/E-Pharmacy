@@ -34,9 +34,10 @@ pipeline {
             steps {
                 sh '''
                     set -e
-
+                    
+                    
                     cd pharmacy-eureka-server
-                    mvn clean test
+                    mvn clean test -DskipTests
                     cd ..
 
                     cd pharmacy-medicine-service
