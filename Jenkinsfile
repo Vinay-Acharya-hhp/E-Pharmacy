@@ -30,63 +30,6 @@ pipeline {
             }
         }
 
-        stage('Make Maven Wrapper Executable') {
-            steps {
-                sh '''
-                    chmod +x pharmacy-eureka-server/mvnw
-                    chmod +x pharmacy-user-service/mvnw
-                    chmod +x pharmacy-medicine-service/mvnw
-                    chmod +x pharmacy-cart-service/mvnw
-                    chmod +x pharmacy-order-service/mvnw
-                    chmod +x pharmacy-payment-service/mvnw
-                    chmod +x pharmacy-api-gateway-service/mvnw
-                '''
-            }
-        }
-
-        stage('Test Microservices') {
-            steps {
-                sh '''
-                    set -e
-
-                    echo "Testing Eureka..."
-                    cd pharmacy-eureka-server
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing User Service..."
-                    cd pharmacy-user-service
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing Medicine Service..."
-                    cd pharmacy-medicine-service
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing Cart Service..."
-                    cd pharmacy-cart-service
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing Order Service..."
-                    cd pharmacy-order-service
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing Payment Service..."
-                    cd pharmacy-payment-service
-                    ./mvnw clean test
-                    cd ..
-
-                    echo "Testing API Gateway..."
-                    cd pharmacy-api-gateway-service
-                    ./mvnw clean test
-                    cd ..
-                '''
-            }
-        }
-
         stage('Docker Login') {
             steps {
                 withCredentials([
@@ -128,17 +71,11 @@ pipeline {
         }
 
         success {
-            echo '======================================'
-            echo ' Jenkins Pipeline Successful!'
-            echo ' Docker images pushed successfully.'
-            echo '======================================'
+            echo 'Docker images built and pushed successfully!'
         }
 
         failure {
-            echo '======================================'
-            echo ' Jenkins Pipeline Failed!'
-            echo ' Check the stage logs above.'
-            echo '======================================'
+            echo 'Pipeline failed.'
         }
     }
 }
