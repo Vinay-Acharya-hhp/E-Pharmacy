@@ -1,7 +1,5 @@
 # E-Pharmacy
 
-# E-Pharmacy
-
 A microservice-based online pharmacy platform — browse the medicine catalog, manage a
 cart, place and track orders, and pay, all backed by independent Spring Boot services
 behind a Eureka + API Gateway setup, with a React (Vite) frontend.
