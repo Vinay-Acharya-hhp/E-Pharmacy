@@ -46,7 +46,7 @@ pipeline {
 
         stage('Test Microservices') {
             steps {
-                sh '''echo "
+                sh '''
                     set -e
 
                     echo "Testing Eureka..."
@@ -83,7 +83,7 @@ pipeline {
                     cd pharmacy-api-gateway-service
                     ./mvnw clean test -Dspring.profiles.active=test
                     cd ..
-                          "
+                          
                 '''
             }
         }
@@ -108,7 +108,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh '''
-                   echo " docker compose build "
+                    docker compose build 
                 '''
             }
         }
@@ -164,7 +164,13 @@ pipeline {
                 '''
             }
         }
-
+       stage('Push Web Docker Images') {
+            steps {
+                sh '''
+                    docker compose push web
+                '''
+            }
+        }
 
 
     }

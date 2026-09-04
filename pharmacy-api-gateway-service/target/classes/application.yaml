@@ -2,42 +2,47 @@ spring:
   application:
     name: pharmacy-api-gateway
 
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+
   cloud:
     gateway:
-      discovery:
-        locator:
-          lower-case-service-id: true
-          enabled: true
-
       server:
-        webmvc:
+        webflux:
+          discovery:
+            locator:
+              lower-case-service-id: true
+              enabled: true
+
           routes:
             - id: user-registration
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
                 - Path=/customer/register
-                - Method=POST  
+                - Method=POST
               filters:
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@ipKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1 
-           
+                    redis-rate-limiter.requestedTokens: 1
+
             - id: user-login
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
                 - Path=/customer/login
-                - Method=POST  
+                - Method=POST
               filters:
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@ipKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1 
-         
+                    redis-rate-limiter.requestedTokens: 1
+
             - id: customer-service
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
@@ -48,7 +53,7 @@ spring:
                     key-resolver: "#{@userKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1     
+                    redis-rate-limiter.requestedTokens: 1
 
             - id: medicine-service
               uri: lb://PHARMACY-MEDICINE-SERVICE
@@ -60,7 +65,7 @@ spring:
                     key-resolver: "#{@ipKeyResolver}"
                     redis-rate-limiter.replenishRate: 5
                     redis-rate-limiter.burstCapacity: 10
-                    redis-rate-limiter.requestesTokens: 1     
+                    redis-rate-limiter.requestedTokens: 1
 
             - id: cart-service
               uri: lb://PHARMACY-CART-SERVICE
@@ -72,7 +77,7 @@ spring:
                     key-resolver: "#{@userKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1     
+                    redis-rate-limiter.requestedTokens: 1
 
             - id: order-service
               uri: lb://PHARMACY-ORDER-SERVICE
@@ -84,7 +89,7 @@ spring:
                     key-resolver: "#{@userKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1     
+                    redis-rate-limiter.requestedTokens: 1
 
             - id: payment-service
               uri: lb://PHARMACY-PAYMENT-SERVICE
@@ -96,10 +101,18 @@ spring:
                     key-resolver: "#{@userKeyResolver}"
                     redis-rate-limiter.replenishRate: 3
                     redis-rate-limiter.burstCapacity: 5
-                    redis-rate-limiter.requestesTokens: 1     
+                    redis-rate-limiter.requestedTokens: 1
+
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
 server:
   port: 8080
+
+# TEMPORARY — remove once routing is confirmed working.
+# Logs every registered route and predicate match attempt at startup/request
+# time, so we can see exactly what the gateway thinks its routes are.
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
