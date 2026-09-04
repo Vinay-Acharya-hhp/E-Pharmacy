@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = 'vinayacharya07'
+        DOCKER_USERNAME = 'vinayacharya07'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -97,7 +97,7 @@ pipeline {
                 ]) {
                     sh '''
                         echo "$DOCKERHUB_TOKEN" | docker login \
-                            -u "$DOCKERHUB_USERNAME" \
+                            -u "$DOCKER_USERNAME" \
                             --password-stdin
                     '''
                 }
