@@ -4,7 +4,8 @@ services:
   eureka:
     build:
       context: ./pharmacy-eureka-server
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-eureka:latest    
     container_name: pharmacy-eureka
     ports:
       - "8761:8761"  
@@ -139,6 +140,7 @@ services:
     build:
       context: ./pharmacy-user-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-user-api:latest    
     container_name: pharmacy-user-api 
     ports:
       - "8081:8081"   
@@ -161,6 +163,7 @@ services:
     build:
       context: ./pharmacy-medicine-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-medicine-api:latest    
     container_name: pharmacy-medicine-api
     ports:
       - "8082:8082"    
@@ -180,9 +183,10 @@ services:
         condition: service_healthy
   
   cart-api:
-    build:
+    build: 
       context: ./pharmacy-cart-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-cart-api:latest    
     container_name: pharmacy-cart-api
     ports:
       - "8083:8083"   
@@ -205,6 +209,7 @@ services:
     build:
       context: ./pharmacy-order-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-order-api:latest    
     container_name: pharmacy-order-api
     ports:
       - "8084:8084"   
@@ -227,6 +232,7 @@ services:
     build:
       context: ./pharmacy-payment-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-payment-api:latest    
     container_name: pharmacy-payment-api
     ports:
       - "8085:8085"    
@@ -247,6 +253,7 @@ services:
     build:
       context: ./pharmacy-api-gateway-service
       dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/pharmacy-api-gateway:latest    
     container_name: pharmacy-api-gateway
     ports:
       - "8080:8080"  
@@ -266,7 +273,8 @@ services:
       context: ./epharmacy-frontend
       dockerfile: Dockerfile
       args:
-        VITE_GATEWAY_URL: ${API_GATEWAY_URL}  
+        VITE_GATEWAY_URL: ${API_GATEWAY_URL}
+    image: ${DOCKER_USERNAME}/pharmacy-web:letest      
     container_name: pharmacy-web
     ports:
       - "5173:80"

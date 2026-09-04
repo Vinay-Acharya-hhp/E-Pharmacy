@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: pharmacy-api-gateway
+
+eureka:
+  client:
+    enabled: false
+
+jwt:
+  secret: test-secret-for-ci-testing
