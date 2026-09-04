@@ -107,7 +107,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh '''
-                    docker compose build
+                   echo " docker compose build "
                 '''
             }
         }
@@ -115,7 +115,7 @@ pipeline {
         stage('Push User Service Images to Docker Hub') {
             steps {
                 sh '''
-                    docker compose push ${DOCKER_USERNAME}/pharmacy-user-api:"IMAGE_TAG"
+                    docker compose push user-api
                 '''
             }
         }
