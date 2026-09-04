@@ -112,10 +112,10 @@ pipeline {
             }
         }
 
-        stage('Push Images to Docker Hub') {
+        stage('Push User Service Images to Docker Hub') {
             steps {
                 sh '''
-                    docker compose push
+                    docker compose push ${DOCKER_USERNAME}/pharmacy-user-api:"IMAGE_TAG"
                 '''
             }
         }
