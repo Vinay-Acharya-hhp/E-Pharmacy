@@ -46,7 +46,7 @@ pipeline {
 
         stage('Test Microservices') {
             steps {
-                sh '''
+                sh '''echo "
                     set -e
 
                     echo "Testing Eureka..."
@@ -83,6 +83,7 @@ pipeline {
                     cd pharmacy-api-gateway-service
                     ./mvnw clean test -Dspring.profiles.active=test
                     cd ..
+                          "
                 '''
             }
         }
@@ -123,7 +124,7 @@ pipeline {
      stage('Push Medicine Docker Images') {
             steps {
                 sh '''
-                   docker compose push medicine-api "
+                   docker compose push medicine-api 
                 '''
             }
         }
@@ -131,35 +132,35 @@ pipeline {
     stage('Push Cart Docker Images') {
             steps {
                 sh '''
-                   docker compose push cart-api "
+                   docker compose push cart-api 
                 '''
             }
         }
     stage('Push Order Docker Images') {
             steps {
                 sh '''
-                   docker compose push order-api "
+                   docker compose push order-api 
                 '''
             }
         }
      stage('Push Api-Gateway Docker Images') {
             steps {
                 sh '''
-                   docker compose push api-gateway "
+                   docker compose push api-gateway 
                 '''
             }
         }
       stage('Push Payment Docker Images') {
             steps {
                 sh '''
-                   docker compose push payment-api "
+                   docker compose push payment-api 
                 '''
             }
         }
        stage('Push Eureka Docker Images') {
             steps {
                 sh '''
-                   docker compose push eureka "
+                   docker compose push eureka 
                 '''
             }
         }
