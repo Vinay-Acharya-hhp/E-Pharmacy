@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = credentials('dockerhub-username')
+        DOCKERHUB_USERNAME = 'vinayacharya07'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
