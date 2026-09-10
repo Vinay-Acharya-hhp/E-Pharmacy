@@ -3,12 +3,13 @@ spring:
     name: pharmacy-medicine-service
 
   datasource:
-    url: jdbc:mysql://medicine-db:3306/medicine_db
-    username: root
-    password: root
+    url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -16,21 +17,25 @@ spring:
       hibernate:
         format_sql: true
   data:
-    redis:
-      host: redis
-      port: 6379
+     redis:
+       host: ${REDIS_HOST}
+       port: ${REDIS_PORT}
   cache:
-    type: redis    
+    type: redis
     redis:
-      time-to-live: 10m
-
+      time-to-live: 10m          
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+      defaultZone: ${EUREKA}
+  instance:
+    prefer-ip-address: true    
 
 server:
   port: 8082
 
 jwt:
   secret: ${JWT_SECRET}
+  
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}  

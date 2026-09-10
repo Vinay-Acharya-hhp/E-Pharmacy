@@ -38,6 +38,7 @@ public class SecurityConfiguration {
 		return http.csrf(customizer->customizer.disable())
 				.cors(cors->{})
 				.authorizeHttpRequests(req->req
+                                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 						
 						.requestMatchers("/customer/register",
 								          "/customer/login").permitAll()

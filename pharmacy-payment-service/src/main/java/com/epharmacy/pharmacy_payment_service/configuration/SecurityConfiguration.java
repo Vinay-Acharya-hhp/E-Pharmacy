@@ -31,6 +31,7 @@ public class SecurityConfiguration {
 		                .cors(cors -> {})
 
 		                .authorizeHttpRequests(req -> req
+                                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
 		                       
 		                        .requestMatchers(

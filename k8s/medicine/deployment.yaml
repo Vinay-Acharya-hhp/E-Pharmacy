@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: medicine-service
+ namespace: epharmacy
+ labels:
+   app: medicine-service
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: medicine-service
+ template:
+   metadata:
+     labels:
+       app: medicine-service
+   spec:
+     containers:
+       - name: medicine-service
+         image: vinayacharya07/pharmacy-medicine-api:v4
+         imagePullPolicy: Always
+         ports:
+           - containerPort: 8082
+         env:
+           - name: DB_URL
+             valueFrom:
+               configMapKeyRef:
+                 name: medicine-service-config
+                 key: DB_URL
+           - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+             value: "http://eureka:8761/eureka/" 
+
+
+
+           - name: REDIS_HOST
+             valueFrom:
+               configMapKeyRef:
+                 name: medicine-service-config
+                 key: REDIS_HOST
+
+           - name: REDIS_PORT
+             valueFrom:
+               configMapKeyRef:
+                 name: medicine-service-config
+                 key: REDIS_PORT
+
+           - name: DB_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: medicine-service-secret
+                 key: DB_USERNAME
+
+           - name: DB_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: medicine-service-secret
+                 key: DB_PASSWORD
+
+           - name: JWT_SECRET
+             valueFrom:
+               secretKeyRef:
+                 name: medicine-service-secret
+                 key: JWT_SECRET
+           - name: CORS_ALLOWED_ORIGINS
+             valueFrom:
+               configMapKeyRef:
+                 name: medicine-service-config
+                 key:  CORS_ALLOWED_ORIGINS  

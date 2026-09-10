@@ -241,7 +241,7 @@ public class OrderServiceImp implements OrderService{
 		    order.setOrderItems(orderItems);
 
 
-		    double total =
+		    Double total =
 		            orderItems.stream()
 		                    .mapToDouble(item ->
 		                            item.getPrice()
@@ -250,11 +250,11 @@ public class OrderServiceImp implements OrderService{
 		                    .sum();
 
 
-		    double discount =
+		    Double discount =
 		            calculatediscount(total);
 
 
-		    double finalAmount =
+		    Double finalAmount =
 		            total - discount;
 
 
@@ -372,7 +372,7 @@ public class OrderServiceImp implements OrderService{
 		    return response;
 	}
 	    
-	    private double calculatediscount(double total) {
+	    private Double calculatediscount(Double total) {
 
 	        if (total > 1000) {
 
@@ -388,7 +388,7 @@ public class OrderServiceImp implements OrderService{
 
 	        } else {
 
-	            return 0;
+	            return null;
 	        }
 	    
 	}

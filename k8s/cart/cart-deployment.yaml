@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: cart-service
+ namespace: epharmacy
+ labels:
+   app: cart-service
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: cart-service
+ template:
+   metadata:
+     labels:
+       app: cart-service
+   spec:
+     containers:
+       - name: cart-service
+         image: vinayacharya07/pharmacy-cart-api:v4
+         imagePullPolicy: Always
+         ports:
+           - containerPort: 8083
+         env:
+           - name: DB_URL
+             valueFrom:
+               configMapKeyRef:
+                 name: cart-service-config
+                 key: DB_URL
+           - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+             value: "http://eureka:8761/eureka"
+           - name: REDIS_HOST
+             valueFrom:
+               configMapKeyRef:
+                 name: cart-service-config
+                 key: REDIS_HOST
+           - name: REDIS_PORT
+             valueFrom:
+               configMapKeyRef:
+                 name: cart-service-config
+                 key: REDIS_PORT
+
+           - name: DB_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: cart-service-secret
+                 key: DB_USERNAME
+
+           - name: DB_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: cart-service-secret
+                 key: DB_PASSWORD
+
+
+           - name: JWT_SECRET
+             valueFrom:
+               secretKeyRef:
+                 name: cart-service-secret
+                 key: JWT_SECRET
+             
+           - name: CORS_ALLOWED_ORIGINS
+             valueFrom:
+               configMapKeyRef:
+                 name: cart-service-config
+                 key: CORS_ALLOWED_ORIGINS        

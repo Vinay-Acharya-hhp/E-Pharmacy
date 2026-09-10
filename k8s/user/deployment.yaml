@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: user-service
+ namespace: epharmacy
+ labels:
+   app: user-service
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: user-service
+ template:
+   metadata:
+     labels:
+       app: user-service
+   spec:
+     containers:
+       - name: user-service
+         image: vinayacharya07/pharmacy-user-api:v4
+         imagePullPolicy: Always
+         ports:
+           - containerPort: 8081
+         env:
+           - name: DB_URL
+             valueFrom:
+               configMapKeyRef:
+                 name: user-service-config
+                 key: DB_URL  
+           - name: EUREKA
+             valueFrom:
+               configMapKeyRef:
+                 name: user-service-config
+                 key: EUREKA
+           
+           - name: REDIS_HOST
+             valueFrom:
+               configMapKeyRef:
+                 name: user-service-config
+                 key: REDIS_HOST
+           
+           - name: REDIS_PORT
+             valueFrom:
+               configMapKeyRef:
+                 name: user-service-config
+                 key: REDIS_PORT        
+
+           - name: DB_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: user-service-secret
+                 key: DB_USERNAME
+           
+           - name: DB_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: user-service-secret
+                 key: DB_PASSWORD         
+
+           - name: JWT_SECRET
+             valueFrom:
+               secretKeyRef:
+                 name: user-service-secret
+                 key: JWT_SECRET
+           - name: CORS_ALLOWED_ORIGINS
+             valueFrom:
+               configMapKeyRef:
+                 name: user-service-config
+                 key: CORS_ALLOWED_ORIGINS      

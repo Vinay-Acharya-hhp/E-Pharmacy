@@ -4,17 +4,26 @@ spring:
 
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:redis}
-      port: ${SPRING_REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
   cloud:
     gateway:
       server:
         webflux:
-          discovery:
-            locator:
-              lower-case-service-id: true
-              enabled: true
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: ${CORS_ALLOWED_ORIGINS}
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                allowCredentials: true
 
           routes:
             - id: user-registration
@@ -106,13 +115,12 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+      defaultZone: ${EUREKA}
+  instance:
+    prefer-ip-address: true 	  	  
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173} 	  	  	  
 server:
   port: 8080
+  
 
-# TEMPORARY — remove once routing is confirmed working.
-# Logs every registered route and predicate match attempt at startup/request
-# time, so we can see exactly what the gateway thinks its routes are.
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG

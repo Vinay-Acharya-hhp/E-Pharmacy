@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: web-service
+ namespace: epharmacy
+ labels:
+   app: web-service
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: web-service
+ template:
+   metadata:
+     labels:
+       app: web-service
+   spec:
+     containers:
+       - name: web-service
+         image: vinayacharya07/pharmacy-web:v4
+         imagePullPolicy: Always
+         ports:
+           - containerPort: 80
+
+         env:
+           - name: GATEWAY_UPSTREAM
+             valueFrom:
+               configMapKeyRef:
+                 name: web-service-config
+                 key:  GATEWAY_UPSTREAM
+           
+           - name: RESOLVER
+             valueFrom:
+               configMapKeyRef:
+                 name: web-service-config
+                 key:  RESOLVER
+
+
+         # No API_GATEWAY_URL env var needed anymore: the gateway URL is
+         # baked into the JS bundle at image build time as the relative
+         # path "/api", and nginx (inside this image) proxies /api/* to
+         # api-gateway-service:8080. A runtime env var here would be
+         # ignored anyway — Vite/static builds don't read process env at
+         # container start.

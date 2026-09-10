@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-service-config
+  namespace: epharmacy
+
+data:
+  GATEWAY_UPSTREAM: "api-gateway-service.epharmacy.svc.cluster.local:8080"
+  RESOLVER: "10.96.0.10"
+  

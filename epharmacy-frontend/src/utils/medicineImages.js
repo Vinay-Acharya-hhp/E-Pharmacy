@@ -1,4 +1,4 @@
-import { PORTS } from "../api/client";
+import { GATEWAY_URL } from "../api/client";
 
 // Real static photos bundled with this app (copied from the medicine
 // service's own src/main/resources/static/images folder) — used whenever
@@ -70,7 +70,7 @@ export function resolveImageUrl(imageUrl) {
   if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
   if (imageUrl.startsWith("/images/catalog/")) return imageUrl;
   const path = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
-  return `${PORTS.medicine}${path}`;
+  return `${GATEWAY_URL}${path}`;
 }
 
 export function monogramFor(name) {

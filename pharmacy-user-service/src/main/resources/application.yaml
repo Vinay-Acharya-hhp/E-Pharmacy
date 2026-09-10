@@ -3,10 +3,10 @@ spring:
     name: pharmacy-user-service
 
   datasource:
-    url: jdbc:mysql://user-db:3306/customer_db
+    url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: root
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -19,8 +19,9 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-
+      defaultZone: ${EUREKA}
+  instance:
+    prefer-ip-address: true   
 server:
   port: 8081
   

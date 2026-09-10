@@ -29,7 +29,9 @@ public class SecurityConfiguration {
 
 	                .cors(cors -> {})
 
-	                .authorizeHttpRequests(req -> req.anyRequest().authenticated()
+                        .authorizeHttpRequests(req -> req
+                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                                .anyRequest().authenticated()
 
 	                        // GET medicine is public
 	                      //  .requestMatchers()

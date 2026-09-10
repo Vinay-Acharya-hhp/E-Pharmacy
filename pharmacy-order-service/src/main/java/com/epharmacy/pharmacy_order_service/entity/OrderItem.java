@@ -25,7 +25,7 @@ public class OrderItem {
   private Order order;
   private Long medicineId;
   private String medicineName;
-  private  double  price;
+  private  Double  price;
   
   private Integer quantity;
   

@@ -13,7 +13,7 @@ public class OrderPaymentResponseDto {
 	
 	private Long orderId;
 	private Long customerId;
-	private double amount;
+	private Double amount;
 	private OrderStatus orderStatus;
 
 }

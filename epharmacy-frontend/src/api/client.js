@@ -1,16 +1,23 @@
 import axios from "axios";
 
-// Every backend microservice is called on its own port. The API gateway
-// (port 8080) has no CORS configuration of its own, but each individual
-// service already allow-lists http://localhost:5173, so the browser talks
-// to each service directly — the same approach the backend ships with.
-export const PORTS = {
-  medicine: import.meta.env.VITE_MEDICINE_URL || "http://localhost:8082",
-  customer: import.meta.env.VITE_CUSTOMER_URL || "http://localhost:8081",
-  cart: import.meta.env.VITE_CART_URL || "http://localhost:8083",
-  order: import.meta.env.VITE_ORDER_URL || "http://localhost:8084",
-  payment: import.meta.env.VITE_PAYMENT_URL || "http://localhost:8085",
-};
+// All requests go through the nginx reverse proxy at the SAME origin as
+// the frontend itself (e.g. http://localhost:5173/api/...), which then
+// forwards to the api-gateway container internally over the Docker
+// network. This is deliberate:
+//
+//   - No CORS handling is needed in the browser at all, since the
+//     request origin and the page origin are identical.
+//   - The browser never needs to know the gateway's host port, so it
+//     can't collide with another service (Jenkins, another container,
+//     etc.) that happens to also be bound to 8080 on the host.
+//   - The gateway's own host port mapping in docker-compose.yaml only
+//     needs to exist for your own manual curl/debugging convenience —
+//     the running app doesn't depend on it.
+//
+// VITE_GATEWAY_URL is still supported as an escape hatch (e.g. for
+// hitting the gateway directly during local dev without Docker/nginx in
+// the loop), but the default is now the proxied relative path.
+export const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL || "/api";
 
 const TOKEN_KEY = "epharmacy_token";
 
@@ -56,17 +63,23 @@ function makeClient(baseURL) {
   return instance;
 }
 
-export const medicineApi = makeClient(PORTS.medicine);
-export const customerApi = makeClient(PORTS.customer);
-export const cartApi = makeClient(PORTS.cart);
-export const orderApi = makeClient(PORTS.order);
-export const paymentApi = makeClient(PORTS.payment);
+// One shared axios instance for every service, pointed at the gateway
+// (via the nginx /api proxy by default — see GATEWAY_URL above).
+const gatewayApi = makeClient(GATEWAY_URL);
+
+export const medicineApi = gatewayApi;
+export const customerApi = gatewayApi;
+export const cartApi = gatewayApi;
+export const orderApi = gatewayApi;
+export const paymentApi = gatewayApi;
 
 export function extractErrorMessage(err, fallback) {
+  const body = err?.response?.data;
   return (
-    err?.response?.data?.message ||
-    err?.response?.data?.error ||
-    (typeof err?.response?.data === "string" ? err.response.data : null) ||
+    (typeof body?.data === "string" ? body.data : null) ||
+    body?.message ||
+    body?.error ||
+    (typeof body === "string" ? body : null) ||
     err?.message ||
     fallback
   );
@@ -75,13 +88,14 @@ export function extractErrorMessage(err, fallback) {
 /**
  * Every endpoint this app calls, grouped by microservice — kept here as a
  * single index so the whole surface area of the backend is visible from
- * one place.
+ * one place. All requests go to GATEWAY_URL; the path prefix below tells
+ * the gateway which service to route each request to.
  *
- *  pharmacy-user-service      (8081, mounted at /customer)
- *  pharmacy-medicine-service  (8082, mounted at /medicine)
- *  pharmacy-cart-service      (8083, mounted at /cart)
- *  pharmacy-order-service     (8084, mounted at /order)
- *  pharmacy-payment-service   (8085, mounted at /payment)
+ *  pharmacy-user-service      (mounted at /customer)
+ *  pharmacy-medicine-service  (mounted at /medicine)
+ *  pharmacy-cart-service      (mounted at /cart)
+ *  pharmacy-order-service     (mounted at /order)
+ *  pharmacy-payment-service   (mounted at /payment)
  */
 export const endpoints = {
   customer: {
