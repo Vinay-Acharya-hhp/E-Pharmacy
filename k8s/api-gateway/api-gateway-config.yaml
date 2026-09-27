@@ -8,4 +8,4 @@ data:
   EUREKA: "http://eureka:8761/eureka/"
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
-  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081,http://localhost:5173"  
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081,http://localhost:5173,http://127.0.0.1:30081,http://localhost:30081" 

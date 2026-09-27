@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: api-gateway-service
-         image: vinayacharya07/pharmacy-api-gateway:v5
+         image: vinayacharya07/pharmacy-api-gateway:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 8080

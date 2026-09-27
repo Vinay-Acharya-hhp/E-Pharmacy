@@ -1,0 +1,459 @@
+---
+# Source: epharmacy/templates/cart-secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: cart-service-secret
+  namespace: epharmacy
+
+type: Opaque
+
+stringData:
+  DB_USERNAME: ""
+  DB_PASSWORD: ""
+  JWT_SECRET: ""
+---
+# Source: epharmacy/templates/medicine-secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: medicine-service-secret
+  namespace: epharmacy
+
+type: Opaque
+
+stringData:
+  DB_USERNAME: ""
+  DB_PASSWORD: ""
+  JWT_SECRET: ""
+---
+# Source: epharmacy/templates/order-secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: order-service-secret
+  namespace: epharmacy
+
+type: Opaque
+
+stringData:
+  DB_USERNAME: ""
+  DB_PASSWORD: ""
+  JWT_SECRET: ""
+---
+# Source: epharmacy/templates/payment-secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: payment-service-secret
+  namespace: epharmacy
+
+type: Opaque
+
+stringData:
+  DB_USERNAME: ""
+  DB_PASSWORD: ""
+  JWT_SECRET: ""
+---
+# Source: epharmacy/templates/user-secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: user-service-secret
+  namespace: epharmacy
+
+type: Opaque
+
+stringData:
+  DB_USERNAME: ""
+  DB_PASSWORD: ""
+  JWT_SECRET: ""
+---
+# Source: epharmacy/templates/cart-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: cart-service-config
+  namespace: epharmacy
+
+data:
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081"
+  DB_NAME: "cart_db"
+  DB_URL: "jdbc:mysql://cart-db:3306/cart_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+  EUREKA: "http://eureka:8761/eureka/"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+# Source: epharmacy/templates/medicine-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: medicine-service-config
+  namespace: epharmacy
+
+data:
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081"
+  DB_NAME: "medicine_db"
+  DB_URL: "jdbc:mysql://medicine-db:3306/medicine_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+  EUREKA: "http://eureka:8761/eureka/"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+# Source: epharmacy/templates/order-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: order-service-config
+  namespace: epharmacy
+
+data:
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081"
+  DB_NAME: "order_db"
+  DB_URL: "jdbc:mysql://order-db:3306/order_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+  EUREKA: "http://eureka:8761/eureka/"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+# Source: epharmacy/templates/payment-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: payment-service-config
+  namespace: epharmacy
+
+data:
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081"
+  DB_NAME: "payment_db"
+  DB_URL: "jdbc:mysql://payment-db:3306/payment_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+  EUREKA: "http://eureka:8761/eureka/"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+# Source: epharmacy/templates/user-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: user-service-config
+  namespace: epharmacy
+
+data:
+  CORS_ALLOWED_ORIGINS: "http://192.168.49.2:30081"
+  DB_NAME: "customer_db"
+  DB_URL: "jdbc:mysql://user-db:3306/user_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
+  EUREKA: "http://eureka:8761/eureka/"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+# Source: epharmacy/templates/cart-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+  namespace: epharmacy
+spec:
+  type: ClusterIP
+  selector:
+    app: cart-service
+  ports:
+    - port: 8083
+      targetPort: 8083
+      protocol: TCP
+---
+# Source: epharmacy/templates/eureka-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: eureka
+  namespace: epharmacy
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: eureka
+
+  ports:
+    - port: 8761
+      targetPort: 8761
+      protocol: TCP
+---
+# Source: epharmacy/templates/gateway-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: api-gateway-service
+  namespace: epharmacy
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: api-gateway-service
+
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+# Source: epharmacy/templates/medicine-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: medicine-service
+  namespace: epharmacy
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: medicine-service
+
+  ports:
+    - port: 8082
+      targetPort: 8082
+      protocol: TCP
+---
+# Source: epharmacy/templates/order-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  namespace: epharmacy
+spec:
+  type: ClusterIP
+  selector:
+    app: order-service
+  ports:
+    - port: 8084
+      targetPort: 8084
+      protocol: TCP
+---
+# Source: epharmacy/templates/payment-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: epharmacy
+spec:
+  type: ClusterIP
+  selector:
+    app: payment-service
+  ports:
+    - port: 8085
+      targetPort: 8085
+      protocol: TCP
+---
+# Source: epharmacy/templates/user-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: epharmacy
+spec:
+  type: ClusterIP
+  selector:
+    app: user-service
+  ports:
+    - port: 8081
+      targetPort: 8081
+      protocol: TCP
+---
+# Source: epharmacy/templates/cart-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+        - name: cart-service
+          image: "vinayacharya07/pharmacy-cart-api:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: cart-service-config
+            - secretRef:
+                name: cart-service-secret
+---
+# Source: epharmacy/templates/eureka-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+        - name: eureka
+          image: "vinayacharya07/pharmacy-eureka:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8761
+---
+# Source: epharmacy/templates/gateway-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway-service
+  template:
+    metadata:
+      labels:
+        app: api-gateway-service
+    spec:
+      containers:
+        - name: api-gateway-service
+          image: "vinayacharya07/pharmacy-api-gateway:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+# Source: epharmacy/templates/medicine-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medicine-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medicine-service
+  template:
+    metadata:
+      labels:
+        app: medicine-service
+    spec:
+      containers:
+        - name: medicine-service
+          image: "vinayacharya07/pharmacy-medicine-api:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: medicine-service-config
+            - secretRef:
+                name: medicine-service-secret
+---
+# Source: epharmacy/templates/order-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: "vinayacharya07/pharmacy-order-api:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: order-service-config
+            - secretRef:
+                name: order-service-secret
+---
+# Source: epharmacy/templates/payment-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: "vinayacharya07/pharmacy-payment-api:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: payment-service-config
+            - secretRef:
+                name: payment-service-secret
+---
+# Source: epharmacy/templates/user-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: epharmacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: "vinayacharya07/pharmacy-user-api:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: user-service-config
+            - secretRef:
+                name: user-service-secret
+

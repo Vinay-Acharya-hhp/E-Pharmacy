@@ -450,6 +450,7 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       JWT_SECRET: ${JWT_SECRET}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
 
     depends_on:
       eureka:
@@ -486,3 +487,4 @@ volumes:
   cart-db-data:
   order-db-data:
   payment-db-data:
+

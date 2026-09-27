@@ -4,12 +4,12 @@ metadata:
   name: web-service
   namespace: epharmacy
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: web-service
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30081  
+        
 

@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epharmacy-api-ingress
+  namespace: epharmacy
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - epharmacy.local
+      secretName: epharmacy-tls-secret    
+  rules:
+    - hosts: epharmacy.local 
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api-gateway-service
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epharmacy-web-ingress
+  namespace: epharmacy
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"  
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - epharmacy.local
+      secretName: epharmacy-tls-secret    
+  rules:
+    - host: epharmacy.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 80

@@ -83,7 +83,7 @@ function PayNowForm({ order, onPaid }) {
         </div>
       </div>
       <button className="btn btn-primary" disabled={paying}>
-        {paying ? "Processing…" : `Pay ₹${Number(order.amountPaid || 10).toFixed(2)}`}
+        {paying ? "Processing…" : `Pay ₹${Number(order.amountPaid || 0).toFixed(2)}`}
       </button>
     </form>
   );

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+        - name: cart-service
+          image: "{{ .Values.images.cart.repository }}:{{ .Values.images.cart.tag }}"
+          imagePullPolicy: {{ .Values.images.cart.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.services.cart.port }}
+          envFrom:
+            - configMapRef:
+                name: cart-service-config
+            - secretRef:
+                name: cart-service-secret

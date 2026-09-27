@@ -1,0 +1,92 @@
+namespace: epharmacy
+
+images:
+  eureka:
+    repository: vinayacharya07/pharmacy-eureka
+    tag: latest
+    pullPolicy: IfNotPresent
+  gateway:
+    repository: vinayacharya07/pharmacy-api-gateway
+    tag: latest
+    pullPolicy: IfNotPresent
+  user:
+    repository: vinayacharya07/pharmacy-user-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  medicine:
+    repository: vinayacharya07/pharmacy-medicine-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  cart:
+    repository: vinayacharya07/pharmacy-cart-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  order:
+    repository: vinayacharya07/pharmacy-order-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  payment:
+    repository: vinayacharya07/pharmacy-payment-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  web:
+    repository: vinayacharya07/pharmacy-web
+    tag: latest
+    pullPolicy: IfNotPresent    
+services:
+  eureka:
+    port: 8761
+  gateway:
+    port: 8080
+  user:
+    port: 8081
+  medicine:
+    port: 8082
+  cart:
+    port: 8083
+  order:
+    port: 8084
+  payment:
+    port: 8085    
+  web:
+    port: 80
+  redis:
+    port: 6379    
+secrets:
+  user:
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    JWT_SECRET: "YEfa5b24N2ILGw1stBVt3277MuNY2Ajr58VOYWGeG7Y="
+  medicine:
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    JWT_SECRET: "YEfa5b24N2ILGw1stBVt3277MuNY2Ajr58VOYWGeG7Y=" 
+  cart:
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    JWT_SECRET: "YEfa5b24N2ILGw1stBVt3277MuNY2Ajr58VOYWGeG7Y="
+  order:
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    JWT_SECRET: "YEfa5b24N2ILGw1stBVt3277MuNY2Ajr58VOYWGeG7Y="
+  payment:
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    JWT_SECRET: "YEfa5b24N2ILGw1stBVt3277MuNY2Ajr58VOYWGeG7Y="   
+  
+mysql:
+  image: mysql:8.0
+  port: 3306
+  rootPassword: root
+  storage:
+    size: 5Gi
+    accessMode: ReadWriteOnce
+    storageClass: gp2
+ingress:
+  enabled: true
+  className: alb
+  host: ""
+  tls:
+    enabled: false
+app:
+  corsAllowedOrigins: ""      

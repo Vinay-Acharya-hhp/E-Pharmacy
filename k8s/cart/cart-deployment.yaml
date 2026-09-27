@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: cart-service
-         image: vinayacharya07/pharmacy-cart-api:v4
+         image: vinayacharya07/pharmacy-cart-api:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 8083

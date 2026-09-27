@@ -26,11 +26,22 @@ export function AuthProvider({ children }) {
     });
     const receivedToken = res.data;
     const claims = decodeJwt(receivedToken);
-    setToken(receivedToken);
-    setCustomerId(claims?.id ? String(claims.id) : null);
+    const id = claims?.id ? String(claims.id) : null;
     const name = claims?.sub || email;
-    setCustomerName(name);
+
+    // Write to localStorage synchronously, right here, BEFORE returning —
+    // not via the useEffect below. The axios interceptor in client.js reads
+    // directly from localStorage on every request; if we only update React
+    // state and let the useEffect catch up asynchronously, a protected
+    // request fired by the page we navigate to immediately after login can
+    // race ahead of that effect and go out with no Authorization header.
+    localStorage.setItem("epharmacy_token", receivedToken);
+    if (id) localStorage.setItem("epharmacy_customer_id", id);
     localStorage.setItem("epharmacy_customer_name", name);
+
+    setToken(receivedToken);
+    setCustomerId(id);
+    setCustomerName(name);
     return receivedToken;
   }
 

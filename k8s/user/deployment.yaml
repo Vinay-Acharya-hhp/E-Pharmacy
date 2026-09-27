@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: user-service
-         image: vinayacharya07/pharmacy-user-api:v4
+         image: vinayacharya07/pharmacy-user-api:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 8081

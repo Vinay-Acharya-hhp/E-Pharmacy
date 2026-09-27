@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: medicine-service
-         image: vinayacharya07/pharmacy-medicine-api:v4
+         image: vinayacharya07/pharmacy-medicine-api:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 8082

@@ -25,7 +25,7 @@ public class SecurityConfiguration {
 	        return http
 	                .csrf(customizer -> customizer.disable())
 
-	                .cors(cors -> {})
+	                .cors(cors -> cors.disable())
 
 	                .authorizeHttpRequests(req -> req.anyRequest().permitAll())
 

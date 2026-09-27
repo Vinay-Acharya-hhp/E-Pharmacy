@@ -36,7 +36,7 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
 		return http.csrf(customizer->customizer.disable())
-				.cors(cors->{})
+				.cors(cors -> cors.disable())
 				.authorizeHttpRequests(req->req
                                                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 						

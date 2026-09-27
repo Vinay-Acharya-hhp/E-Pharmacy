@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { endpoints, extractErrorMessage } from "../api/client";
+import { STATIC_IMAGES } from "../utils/medicineImages";
 import Icon from "../components/Icon";
 import "./Admin.css";
 
@@ -18,16 +19,22 @@ const CATEGORY_OPTIONS = [
   "Homeopathy",
 ];
 
+// A human-readable label for each STATIC_IMAGES key, e.g. "vitaminB12" -> "Vitamin b12".
+function labelFor(key) {
+  const spaced = key.replace(/([A-Z])/g, " $1");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+// Built from STATIC_IMAGES (src/utils/medicineImages.js) so this dropdown
+// never drifts out of sync with the app's actual bundled photo catalog —
+// add a photo there (see public/images/catalog) and it appears here too,
+// with no separate list to maintain.
 const STATIC_OPTIONS = [
   { label: "None (use category default)", value: "" },
-  { label: "Paracetamol pack photo", value: "/images/catalog/paracetamol_500mg.jpg" },
-  { label: "Vitamin B12 photo", value: "/images/catalog/vitamin_B12.webp" },
-  { label: "Amla powder photo", value: "/images/catalog/Amla-powder-1.png" },
-  { label: "Ayurvedic label photo", value: "/images/catalog/ayurvedic.webp" },
-  { label: "English medicine strip photo", value: "/images/catalog/english.webp" },
-  { label: "Homeopathy bottle photo", value: "/images/catalog/homiopati.webp" },
-  { label: "Tonic bottle photo", value: "/images/catalog/tonic.webp" },
-  { label: "ORS sachet photo", value: "/images/catalog/ors.webp" },
+  ...Object.entries(STATIC_IMAGES).map(([key, value]) => ({
+    label: `${labelFor(key)} photo`,
+    value,
+  })),
 ];
 
 const emptyMedicine = {

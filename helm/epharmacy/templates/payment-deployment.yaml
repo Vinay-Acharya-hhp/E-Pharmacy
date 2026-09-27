@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: "{{ .Values.images.payment.repository }}:{{ .Values.images.payment.tag }}"
+          imagePullPolicy: {{ .Values.images.payment.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.services.payment.port }}
+          envFrom:
+            - configMapRef:
+                name: payment-service-config
+            - secretRef:
+                name: payment-service-secret

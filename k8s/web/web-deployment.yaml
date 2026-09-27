@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: web-service
-         image: vinayacharya07/pharmacy-web:v4
+         image: vinayacharya07/pharmacy-web:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 80

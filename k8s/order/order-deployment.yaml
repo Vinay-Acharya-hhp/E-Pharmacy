@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
        - name: order-service
-         image: vinayacharya07/pharmacy-order-api:v4
+         image: vinayacharya07/pharmacy-order-api:latest
          imagePullPolicy: Always
          ports:
            - containerPort: 8084

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medicine-service
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medicine-service
+  template:
+    metadata:
+      labels:
+        app: medicine-service
+    spec:
+      containers:
+        - name: medicine-service
+          image: "{{ .Values.images.medicine.repository }}:{{ .Values.images.medicine.tag }}"
+          imagePullPolicy: {{ .Values.images.medicine.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.services.medicine.port }}
+          envFrom:
+            - configMapRef:
+                name: medicine-service-config
+            - secretRef:
+                name: medicine-service-secret

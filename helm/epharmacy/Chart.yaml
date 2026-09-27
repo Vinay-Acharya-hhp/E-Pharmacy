@@ -1,0 +1,11 @@
+apiVersion: v2
+
+name: epharmacy
+
+description: Helm chart for E-Pharmacy microservices application
+
+type: application
+
+version: 1.0.0
+
+appVersion: "1.0.0"
