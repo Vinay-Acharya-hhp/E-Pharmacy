@@ -5,7 +5,7 @@ spring:
     url: ${DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    password: ${dB_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:

@@ -39,9 +39,10 @@ spring:
             - id: user-registration
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
-                - Path=/customer/register
+                - Path=/api/customer/register
                 - Method=POST
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@ipKeyResolver}"
@@ -52,9 +53,10 @@ spring:
             - id: user-login
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
-                - Path=/customer/login
+                - Path=/api/customer/login
                 - Method=POST
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@ipKeyResolver}"
@@ -65,13 +67,17 @@ spring:
             - id: customer-service
               uri: lb://PHARMACY-USER-SERVICE
               predicates:
-                - Path=/customer/**
+                - Path=/api/customer/**
+              filters:
+                - StripPrefix=1
+
 
             - id: medicine-service
               uri: lb://PHARMACY-MEDICINE-SERVICE
               predicates:
-                - Path=/medicine/**
+                - Path=/api/medicine/**
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@ipKeyResolver}"
@@ -82,8 +88,9 @@ spring:
             - id: cart-service
               uri: lb://PHARMACY-CART-SERVICE
               predicates:
-                - Path=/cart/**
+                - Path=/api/cart/**
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@userKeyResolver}"
@@ -94,8 +101,9 @@ spring:
             - id: order-service
               uri: lb://PHARMACY-ORDER-SERVICE
               predicates:
-                - Path=/order/**
+                - Path=/api/order/**
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@userKeyResolver}"
@@ -106,8 +114,9 @@ spring:
             - id: payment-service
               uri: lb://PHARMACY-PAYMENT-SERVICE
               predicates:
-                - Path=/payment/**
+                - Path=/api/payment/**
               filters:
+                - StripPrefix=1
                 - name: RequestRateLimiter
                   args:
                     key-resolver: "#{@userKeyResolver}"

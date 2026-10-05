@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epharmacy-api
+  namespace: epharmacy
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-036c8451d28b22df9,subnet-0aa0496c95558a3ef
+    alb.ingress.kubernetes.io/security-groups: sg-0240eb59dc4092780
+    alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+    alb.ingress.kubernetes.io/success-codes: "200-499"
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway-service
+                port:
+                  number: 8080

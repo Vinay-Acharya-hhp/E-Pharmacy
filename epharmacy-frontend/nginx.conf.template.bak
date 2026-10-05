@@ -15,6 +15,7 @@ server {
 
     location /api/ {
         set $gateway_upstream ${GATEWAY_UPSTREAM};
+        rewrite ^/api/(.*)$ /$1 break;
         proxy_pass http://$gateway_upstream$uri$is_args$args;
 
         proxy_http_version 1.1;
