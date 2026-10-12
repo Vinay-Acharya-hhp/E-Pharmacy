@@ -5,15 +5,19 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x mvnw
-
-RUN ./mvnw clean package -DskipTests
+RUN chmod +x mvnw && \
+   ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+RUN addgroup -S epharmgroup && \
+    adduser -S -G epharmgroup epharmuser
+
+COPY --from=build --chown=epharmuser:epharmgroup /app/target/*.jar app.jar
+
+USER epharmuser:epharmgroup 
 
 EXPOSE 8080
 
