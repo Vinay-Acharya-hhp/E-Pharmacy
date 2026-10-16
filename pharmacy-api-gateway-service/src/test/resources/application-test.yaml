@@ -8,3 +8,4 @@ eureka:
 
 jwt:
   secret: test-secret-for-ci-testing
+  

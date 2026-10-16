@@ -1,7 +1,7 @@
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
 
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \ --disable-openapi-validation
   -n kube-system \
   --set clusterName=epharmacy \
   --set serviceAccount.create=false \
