@@ -1,0 +1,105 @@
+pipeline {
+  agent any
+
+  environment {
+    JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'
+    PATH = "${JAVA_HOME}/bin:${env.PATH}"
+
+    AWS_REGION  = 'ap-south-1'
+    REGISTRY    = '960233595057.dkr.ecr.ap-south-1.amazonaws.com'
+    SERVICE_DIR = 'pharmacy-user-service'
+    ECR_REPO    = 'epharmacy-tf/user'
+    IMAGE       = "${REGISTRY}/${ECR_REPO}"
+    IMAGE_TAG   = "${BUILD_NUMBER}"
+    
+     GITOPS_REPO        = 'https://github.com/Vinay-Acharya-hhp/aws-gitops.git'
+        GITOPS_BRANCH      = 'main'
+        GITOPS_VALUES_FILE = 'values.yaml'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git url: 'https://github.com/Vinay-Acharya-hhp/E-Pharmacy.git', branch: 'main'
+      }
+    }
+
+    stage('Build and unit test') {
+      steps {
+        sh '''
+          cd ${SERVICE_DIR}
+          mvn -B clean verify -Dspring.profiles.active=test
+        '''
+      }
+    }
+
+    stage('Docker build') {
+      steps {
+        sh '''
+          docker build --platform linux/amd64 -t ${IMAGE}:${IMAGE_TAG} ${SERVICE_DIR}/
+        '''
+      }
+    }
+
+    stage('Push to ECR') {
+      steps {
+        sh '''
+          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
+          docker push ${IMAGE}:${IMAGE_TAG}
+        '''
+      }
+    }
+    stage('Update GitOps Repository') {
+            steps {
+                withCredentials([
+                    gitUsernamePassword(
+                        credentialsId: 'Gitops-cred',
+                        gitToolName: 'Default'
+                    )
+                ]) {
+                    sh '''
+                        set -e
+
+                        yq --version
+
+                        rm -rf gitops
+                        git clone --branch ${GITOPS_BRANCH} ${GITOPS_REPO} gitops
+                        cd gitops
+
+                        # Update only this service's tag
+                        yq -i '.services["user-service"].tag = strenv(IMAGE_TAG)' ${GITOPS_VALUES_FILE}
+
+                        git config user.name  "vinay"
+                        git config user.email "acharyavinay07@gmail.com"
+
+                        git add ${GITOPS_VALUES_FILE}
+
+                        if git diff --cached --quiet; then
+                            echo "No GitOps changes detected"
+                        else
+                            git commit -m "Update user-service image to ${IMAGE_TAG}"
+                            git pull --rebase origin ${GITOPS_BRANCH}
+                            git push origin ${GITOPS_BRANCH}
+                        fi
+                    '''
+                }
+            }
+        }
+  }
+
+  post {
+      always {
+            sh 'docker logout ${ECR_HOST} || true'
+            sh 'docker rmi ${LOCAL_IMAGE}:${IMAGE_TAG} ${REGISTRY}/${ECR_IMAGE}:${IMAGE_TAG} || true'
+            sh 'rm -rf gitops'
+        }
+    success {
+      echo "Pushed ${IMAGE}:${IMAGE_TAG}"
+    }
+    always {
+      sh 'docker rmi ${IMAGE}:${IMAGE_TAG} || true'
+      cleanWs()
+    }
+  }
+}
+
